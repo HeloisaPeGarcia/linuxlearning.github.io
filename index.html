@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TermHacker OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --accent:#22d3ee;--accent2:#818cf8;--accent-glow:rgba(34,211,238,0.15);
+  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d3e;
+  --border:#2a3347;--border2:#344060;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --green:#4ade80;--red:#f87171;--yellow:#fbbf24;--blue:#60a5fa;--purple:#a78bfa;
+  --titlebar:#0d1117;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:13px;display:flex;flex-direction:column}
+.font-mono{font-family:'JetBrains Mono',monospace}
+
+/* BOOT */
+#boot{position:fixed;inset:0;background:#000;z-index:999;display:flex;flex-direction:column;justify-content:center;padding:2rem 3rem;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;overflow:hidden}
+#boot .logo{color:#22d3ee;font-size:10px;line-height:1.2;margin-bottom:1.5rem;opacity:.8}
+#boot-lines{display:flex;flex-direction:column;gap:3px}
+.boot-ok{color:#4ade80}.boot-info{color:#60a5fa}.boot-warn{color:#fbbf24}
+
+/* TOPBAR GNOME-STYLE */
+#topbar{height:28px;background:#000000dd;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid rgba(255,255,255,.06);z-index:50;flex-shrink:0;font-size:12px}
+#topbar .activities{color:var(--text);font-weight:500;cursor:pointer;padding:0 8px;border-radius:4px;transition:.15s}
+#topbar .activities:hover{background:rgba(255,255,255,.1)}
+#topbar-center{position:absolute;left:50%;transform:translateX(-50%);font-weight:500;font-size:12px;color:var(--text)}
+#topbar-right{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:11px}
+.top-icon{display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 5px;border-radius:3px;transition:.15s}
+.top-icon:hover{background:rgba(255,255,255,.1)}
+
+/* DESKTOP */
+#desktop{flex:1;position:relative;background:var(--bg);overflow:hidden;background-image:radial-gradient(circle at 20% 50%,rgba(34,211,238,.03) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(129,140,248,.03) 0%,transparent 50%)}
+
+/* DOCK */
+#dock{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;padding:6px 10px;gap:4px;z-index:50}
+.dock-sep{width:1px;height:28px;background:var(--border2);margin:0 4px}
+.dock-app{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;position:relative;font-size:18px}
+.dock-app:hover{transform:translateY(-4px) scale(1.1)}
+.dock-app .tooltip{position:absolute;bottom:calc(100% + 8px);background:#000;color:var(--text);padding:3px 8px;border-radius:5px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none;transition:.15s;border:1px solid var(--border)}
+.dock-app:hover .tooltip{opacity:1}
+.dock-indicator{width:4px;height:4px;border-radius:50%;background:var(--accent);position:absolute;bottom:-2px;left:50%;transform:translateX(-50%)}
+
+/* WINDOWS */
+.win{position:absolute;display:flex;flex-direction:column;border-radius:12px;border:1px solid var(--border2);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);min-width:300px}
+.win.focused{border-color:var(--border2);z-index:30!important}
+.win-titlebar{height:34px;background:var(--titlebar);display:flex;align-items:center;padding:0 12px;gap:8px;cursor:move;flex-shrink:0;border-bottom:1px solid var(--border)}
+.win-btn{width:12px;height:12px;border-radius:50%;cursor:pointer;transition:.1s;flex-shrink:0}
+.btn-close{background:#ff5f56}.btn-min{background:#ffbd2e}.btn-max{background:#27c93f}
+.win-btn:hover{filter:brightness(1.2)}
+.win-title{flex:1;text-align:center;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.win-body{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* TERMINAL */
+#win-term{width:680px;height:480px;top:60px;left:60px}
+#term-tabs{background:#0a0e18;display:flex;align-items:center;padding:0 8px;gap:2px;border-bottom:1px solid var(--border);flex-shrink:0;height:32px}
+.term-tab{padding:4px 12px;border-radius:5px 5px 0 0;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text3);cursor:pointer;background:transparent;border:none;transition:.15s}
+.term-tab.active{background:var(--bg3);color:var(--text);border-top:1px solid var(--accent)}
+.term-tab-add{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;font-size:14px;border-radius:4px;transition:.15s}
+.term-tab-add:hover{color:var(--text);background:rgba(255,255,255,.05)}
+#term-output{flex:1;overflow-y:auto;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;color:var(--text);background:#0a0e18;cursor:text}
+#term-output::-webkit-scrollbar{width:6px}
+#term-output::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.term-line{word-wrap:break-word;white-space:pre-wrap}
+.t-dir{color:var(--accent);font-weight:500}
+.t-file{color:var(--text)}
+.t-exec{color:var(--green);font-weight:500}
+.t-err{color:var(--red)}
+.t-warn{color:var(--yellow)}
+.t-info{color:var(--blue)}
+.t-sys{color:var(--text3);font-style:italic}
+.t-ok{color:var(--green);font-weight:700}
+.t-prompt{color:var(--accent);font-weight:500}
+.t-user{color:var(--green)}
+.t-host{color:var(--blue)}
+.t-sep{color:var(--text3)}
+.t-path{color:var(--accent)}
+.t-dollar{color:var(--text2)}
+.t-cmd{color:var(--text)}
+.t-comment{color:var(--text3)}
+.t-symlink{color:var(--yellow)}
+.t-highlight{background:rgba(251,191,36,.25);color:var(--yellow);border-radius:2px;padding:0 2px}
+
+#term-input-row{display:flex;align-items:flex-start;padding:6px 14px 10px;background:#0a0e18;border-top:1px solid var(--border);gap:0;flex-shrink:0}
+#term-prompt-label{font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:nowrap;margin-right:6px;line-height:1.7}
+#term-input-wrap{position:relative;flex:1;display:flex;align-items:flex-start}
+#cmd-display{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);white-space:pre-wrap;word-break:break-all;line-height:1.7;min-height:1.7em}
+#cursor{display:inline-block;width:7px;height:14px;background:var(--accent);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#real-input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:text;font-size:12px}
+.autocomplete-box{position:absolute;bottom:calc(100% + 2px);left:0;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px;z-index:100;min-width:180px;max-height:160px;overflow-y:auto}
+.ac-item{padding:3px 8px;border-radius:3px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)}
+.ac-item:hover,.ac-item.selected{background:var(--bg4);color:var(--text)}
+
+/* MISSION PANEL */
+#win-mission{width:310px;height:auto;top:60px;right:60px}
+#win-mission .win-body{padding:14px;background:var(--bg2);gap:12px;overflow:visible}
+.mission-header{display:flex;justify-content:space-between;align-items:center}
+.mission-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500}
+.badge-local{background:rgba(34,211,238,.12);color:var(--accent);border:1px solid rgba(34,211,238,.2)}
+.badge-remote{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.mission-progress-wrap{display:flex;align-items:center;gap:10px}
+.mission-lvl-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:var(--accent);flex-shrink:0}
+.progress-bar-bg{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s ease}
+.mission-step-label{font-size:10px;color:var(--text3);text-align:right}
+.mission-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12.5px;line-height:1.65;color:var(--text2)}
+.mission-card .mission-title{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.mission-hint{background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.15);border-radius:6px;padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text2);margin-top:8px}
+.mission-hint span{color:var(--accent)}
+
+/* LESSON MODAL */
+#lesson-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center}
+#lesson-modal.open{display:flex}
+.lesson-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:560px;max-height:80vh;overflow-y:auto;padding:24px}
+.lesson-box h2{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px}
+.lesson-box .lesson-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.lesson-section{margin-bottom:16px}
+.lesson-section h3{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+.lesson-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding:8px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)}
+.lesson-cmd{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);background:rgba(34,211,238,.08);padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.lesson-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.lesson-example{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);margin-top:3px}
+.lesson-close{margin-top:16px;padding:8px 20px;background:var(--accent);color:#000;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:.15s}
+.lesson-close:hover{filter:brightness(1.1)}
+
+/* MAN PAGE */
+#man-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center}
+#man-modal.open{display:flex}
+.man-box{background:#0a0e18;border:1px solid var(--border2);border-radius:10px;width:600px;max-height:80vh;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--text2);padding:20px}
+.man-box h1{color:var(--text);font-size:14px;margin-bottom:4px}
+.man-section{color:var(--text);font-weight:700;margin:12px 0 4px;text-transform:uppercase}
+.man-close{float:right;background:none;border:1px solid var(--border2);color:var(--text2);padding:2px 10px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px}
+
+/* SYSMON */
+#win-sysmon{width:340px;height:280px;top:60px;left:780px;display:none}
+#win-sysmon .win-body{background:var(--bg2);padding:12px;gap:10px;display:flex;flex-direction:column;overflow:visible}
+.sysmon-bar-wrap{display:flex;flex-direction:column;gap:4px}
+.sysmon-label{display:flex;justify-content:space-between;font-size:11px;font-family:'JetBrains Mono',monospace}
+.sysmon-bar{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.sysmon-fill{height:100%;border-radius:4px;transition:width .8s}
+.sysmon-net{display:flex;gap:8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.sysmon-net span{color:var(--text2)}
+canvas#cpu-chart{width:100%!important;height:70px!important}
+
+/* FILE MANAGER */
+#win-files{width:580px;height:400px;top:60px;left:60px;display:none}
+#win-files .win-body{background:var(--bg2);display:flex;overflow:hidden}
+.fm-sidebar{width:140px;background:var(--bg3);border-right:1px solid var(--border);padding:10px 8px;flex-shrink:0}
+.fm-section{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px;padding-left:8px}
+.fm-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--text2);transition:.1s}
+.fm-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.fm-item.active{background:rgba(34,211,238,.1);color:var(--accent)}
+.fm-icon{font-size:14px;width:18px;text-align:center}
+.fm-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.fm-toolbar{height:38px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
+.fm-path{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2)}
+.fm-grid{flex:1;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;overflow-y:auto}
+.fm-file-item{width:80px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:8px;cursor:pointer;transition:.1s;text-align:center}
+.fm-file-item:hover{background:rgba(255,255,255,.06)}
+.fm-file-item .fi-icon{font-size:28px;line-height:1}
+.fm-file-item .fi-name{font-size:10px;color:var(--text2);word-break:break-all;line-height:1.3}
+
+/* LINUX-LIKE SHELL ENHANCEMENTS */
+#dock{left:14px;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;border-radius:18px;padding:10px 7px;gap:6px}
+.dock-sep{width:28px;height:1px;margin:4px 0}
+.dock-app:hover{transform:translateX(4px) scale(1.08)}
+.dock-app .tooltip{left:calc(100% + 10px);bottom:auto;top:50%;transform:translateY(-50%)}
+.desktop-icon{position:absolute;width:86px;padding:10px 8px;border-radius:10px;text-align:center;cursor:pointer;color:var(--text2);transition:.15s;font-size:11px;user-select:none}
+.desktop-icon:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.desktop-icon .dicon{display:block;font-size:30px;margin-bottom:6px}
+#app-menu,#quick-panel{position:absolute;top:34px;background:rgba(11,16,25,.96);backdrop-filter:blur(18px);border:1px solid var(--border2);border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.55);z-index:120;display:none;overflow:hidden}
+#app-menu.open,#quick-panel.open{display:block}
+#app-menu{left:10px;width:270px;padding:8px}
+.menu-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:6px 8px}
+.menu-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--text2);transition:.12s}
+.menu-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.menu-item .mi{font-size:17px;width:20px;text-align:center}
+#quick-panel{right:10px;width:290px;padding:10px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.quick-tile{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;color:var(--text2);transition:.15s}
+.quick-tile:hover,.quick-tile.active{border-color:var(--accent);color:var(--text);background:rgba(34,211,238,.08)}
+.quick-tile strong{display:block;font-size:12px;color:var(--text);margin-bottom:3px}
+.shell-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg3);border-radius:999px;padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)}
+.shell-chip.active{color:var(--accent);border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.08)}
+#notifications{position:absolute;right:18px;bottom:18px;z-index:160;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{width:320px;background:rgba(11,16,25,.96);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:12px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:toastIn .25s ease}
+.toast-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.toast-body{font-size:11px;line-height:1.5;color:var(--text2)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#win-settings{width:520px;height:390px;top:78px;left:calc(50% - 260px);display:none}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;background:var(--bg2);height:100%;overflow:auto}
+.settings-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px}
+.settings-card h3{font-size:12px;color:var(--text);margin-bottom:10px}
+.settings-card p{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:10px}
+.ui-btn{border:1px solid var(--border2);background:var(--bg4);color:var(--text);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:11px;transition:.15s;margin:3px 4px 3px 0}
+.ui-btn:hover{border-color:var(--accent);background:rgba(34,211,238,.08)}
+.status-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#sandbox-banner{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:45;display:none;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.32);color:var(--yellow);padding:7px 12px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#sandbox-banner.active{display:block}
+.file-preview{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:210;display:none;align-items:center;justify-content:center}
+.file-preview.open{display:flex}
+.file-preview-box{width:min(700px,88vw);max-height:76vh;overflow:auto;background:#0a0e18;border:1px solid var(--border2);border-radius:14px;padding:18px;font-family:'JetBrains Mono',monospace;color:var(--text2);white-space:pre-wrap;line-height:1.6}
+.file-preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:var(--text)}
+.term-badge{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid var(--border);color:var(--text3);margin-left:8px}
+@media (max-width:900px){#dock{left:50%;top:auto;bottom:10px;transform:translateX(-50%);flex-direction:row}.dock-sep{width:1px;height:28px}.dock-app:hover{transform:translateY(-4px) scale(1.08)}.dock-app .tooltip{left:50%;bottom:calc(100% + 8px);top:auto;transform:translateX(-50%)}#win-settings{left:5vw;width:90vw}.desktop-icon{display:none}}
+
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <pre class="logo">
+  ████████╗███████╗██████╗ ███╗   ███╗██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗██████╗
+     ██╔══╝██╔════╝██╔══██╗████╗ ████║██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+     ██║   █████╗  ██████╔╝██╔████╔██║███████║███████║██║     █████╔╝ █████╗  ██████╔╝
+     ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+     ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+     ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+                                    OS v6.0 — Educational Linux Environment</pre>
+  <div id="boot-lines"></div>
+</div>
+
+<!-- OS -->
+<div id="os" style="display:none;flex-direction:column;height:100%">
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div style="display:flex;align-items:center;gap:2px">
+    <div class="activities" onclick="toggleAppMenu()">Aplicações ▾</div>
+    <div style="width:1px;height:14px;background:var(--border2);margin:0 4px"></div>
+    <span style="color:var(--text3);cursor:pointer" onclick="openWindow('win-files')">Arquivos</span>
+  </div>
+  <div id="topbar-center">—</div>
+  <div id="topbar-right">
+    <div class="top-icon" title="Rede">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z" opacity=".4"/></svg>
+      <span id="net-indicator">LOCAL</span>
+    </div>
+    <div class="top-icon" onclick="toggleSandbox()" title="Alternar modo sandbox">🧪 <span id="sandbox-top">OFF</span></div>
+    <div class="top-icon">🔋 100%</div>
+    <div class="top-icon" id="top-clock-el">Seg 00:00</div>
+    <div class="top-icon" onclick="toggleQuickPanel()" style="background:rgba(255,255,255,.08);border-radius:50%;width:22px;height:22px;justify-content:center" title="Configurações rápidas">👤</div>
+  </div>
+</div>
+
+<div id="app-menu">
+  <div class="menu-title">Aplicações</div>
+  <div class="menu-item" onclick="openWindow('win-term');closeShellPanels()"><span class="mi">🖥️</span><div><div>Terminal</div><small>Shell Linux educativo</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-files');closeShellPanels()"><span class="mi">📁</span><div><div>Arquivos</div><small>Navegue no sistema virtual</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-sysmon');closeShellPanels()"><span class="mi">📊</span><div><div>Monitor do Sistema</div><small>CPU, RAM e tráfego</small></div></div>
+  <div class="menu-item" onclick="openSettings();closeShellPanels()"><span class="mi">⚙️</span><div><div>Configurações</div><small>Tema, sandbox e interface</small></div></div>
+  <div class="menu-title">Ambiente</div>
+  <div class="menu-item" onclick="toggleSandbox();closeShellPanels()"><span class="mi">🧪</span><div><div>Alternar Sandbox</div><small>Teste sem afetar a sessão principal</small></div></div>
+</div>
+<div id="quick-panel">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong style="font-size:13px">Painel rápido</strong>
+    <span class="shell-chip" id="sandbox-chip">🧪 Sandbox OFF</span>
+  </div>
+  <div class="quick-grid">
+    <div class="quick-tile" onclick="toggleSandbox()"><strong>Sandbox</strong><span id="quick-sandbox-label">Desativado</span></div>
+    <div class="quick-tile" onclick="openWindow('win-sysmon')"><strong>Sistema</strong>Monitor</div>
+    <div class="quick-tile" onclick="applyTheme('green')"><strong>Tema</strong>Verde</div>
+    <div class="quick-tile" onclick="applyTheme('cyan')"><strong>Tema</strong>Ciano</div>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div id="sandbox-banner">🧪 MODO SANDBOX — alterações descartáveis</div>
+  <div class="desktop-icon" style="top:24px;left:92px" ondblclick="openWindow('win-files')"><span class="dicon">🏠</span>Home</div>
+  <div class="desktop-icon" style="top:122px;left:92px" ondblclick="showLesson()"><span class="dicon">📘</span>Manual</div>
+  <div class="desktop-icon" style="top:220px;left:92px" ondblclick="toggleSandbox()"><span class="dicon">🧪</span>Sandbox</div>
+
+  <!-- TERMINAL WINDOW -->
+  <div class="win" id="win-term" style="width:700px;height:490px;top:50px;left:50px;z-index:20">
+    <div class="win-titlebar" id="win-term-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-term')"></div>
+      <div class="win-btn btn-min" onclick="minimizeWin('win-term')"></div>
+      <div class="win-btn btn-max" onclick="maximizeWin('win-term')"></div>
+      <div class="win-title" id="win-term-title">root@termhacker: ~</div>
+    </div>
+    <div class="win-body" style="background:#0a0e18">
+      <div id="term-tabs">
+        <button class="term-tab active" id="tab-1">1: bash</button>
+        <button class="term-tab-add" onclick="newTab()" title="Nova aba">+</button>
+      </div>
+      <div id="term-output" onclick="realInput.focus()"></div>
+      <div id="term-input-row">
+        <div id="term-prompt-label"></div>
+        <div id="term-input-wrap">
+          <span id="cmd-display"></span><span id="cursor"></span>
+          <div id="autocomplete-box" class="autocomplete-box" style="display:none"></div>
+          <input type="text" id="real-input" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION WINDOW -->
+  <div class="win" id="win-mission" style="width:310px;top:50px;right:50px;left:auto;z-index:15">
+    <div class="win-titlebar" id="win-mission-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-mission')"></div>
+      <div class="win-btn btn-min"></div>
+      <div class="win-btn btn-max"></div>
+      <div class="win-title">📋 Missões</div>
+    </div>
+    <div class="win-body" style="padding:14px;background:var(--bg2);display:flex;flex-direction:column;gap:12px">
+      <div class="mission-header">
+        <span class="mission-badge badge-local" id="net-badge">LOCAL</span>
+        <span class="mission-step-label">Missão <span id="m-step">1</span>/<span id="m-total">14</span></span>
+      </div>
+      <div class="mission-progress-wrap">
+        <div class="mission-lvl-circle" id="m-lvl">1</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="m-bar" style="width:0%"></div></div>
+      </div>
+      <div class="mission-card">
+        <div class="mission-title" id="m-category">INICIANTE</div>
+        <div id="m-desc">Carregando...</div>
+        <div class="mission-hint" id="m-hint" style="display:none"><span>$</span> <span id="m-hint-cmd"></span></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="showLesson()" style="flex:1;padding:7px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);color:var(--accent);border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:.15s">📖 Referência</button>
+        <button onclick="revealHint()" style="flex:1;padding:7px;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.2);color:var(--purple);border-radius:6px;cursor:pointer;font-size:11px;transition:.15s">💡 Dica</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSMON WINDOW -->
+  <div class="win" id="win-sysmon" style="width:320px;height:290px;top:50px;left:800px;z-index:15">
+    <div class="win-titlebar" id="win-sysmon-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-sysmon')"></div>
+      <div class="win-btn btn-min"></div>
+      <div class="win-btn btn-max"></div>
+      <div class="win-title">📊 Monitor do Sistema</div>
+    </div>
+    <div id="sysmon-body" class="win-body" style="padding:12px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;overflow:visible"></div>
+  </div>
+
+  <!-- FILE MANAGER WINDOW -->
+  <div class="win" id="win-files" style="width:580px;height:400px;top:60px;left:60px;display:none;z-index:15">
+    <div class="win-titlebar" id="win-files-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-files')"></div>
+      <div class="win-btn btn-min"></div>
+      <div class="win-btn btn-max"></div>
+      <div class="win-title">📁 Gerenciador de Arquivos — Nautilus</div>
+    </div>
+    <div class="win-body" style="display:flex;overflow:hidden;background:var(--bg2)">
+      <div class="fm-sidebar">
+        <div class="fm-section">Favoritos</div>
+        <div class="fm-item active" onclick="fmNavigate('home')"><span class="fm-icon">🏠</span>Pasta Pessoal</div>
+        <div class="fm-item" onclick="fmNavigate('root')"><span class="fm-icon">💾</span>Raiz /</div>
+        <div class="fm-section">Dispositivos</div>
+        <div class="fm-item"><span class="fm-icon">💿</span>sda1 (28G)</div>
+        <div class="fm-item"><span class="fm-icon">🔌</span>tmpfs</div>
+      </div>
+      <div class="fm-main">
+        <div class="fm-toolbar">
+          <button style="background:none;border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px" onclick="fmBack()">‹</button>
+          <input class="fm-path" id="fm-path-bar" value="/home/root" readonly>
+        </div>
+        <div class="fm-grid" id="fm-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS WINDOW -->
+  <div class="win" id="win-settings" style="z-index:18">
+    <div class="win-titlebar" id="win-settings-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-settings')"></div>
+      <div class="win-btn btn-min" onclick="minimizeWin('win-settings')"></div>
+      <div class="win-btn btn-max" onclick="maximizeWin('win-settings')"></div>
+      <div class="win-title">⚙️ Configurações do Ambiente</div>
+    </div>
+    <div class="win-body">
+      <div class="settings-grid">
+        <div class="settings-card"><h3>🎨 Aparência</h3><p>Troque rapidamente a cor principal do sistema.</p><button class="ui-btn" onclick="applyTheme('cyan')">Ciano</button><button class="ui-btn" onclick="applyTheme('green')">Verde</button><button class="ui-btn" onclick="applyTheme('amber')">Âmbar</button><button class="ui-btn" onclick="applyTheme('purple')">Roxo</button></div>
+        <div class="settings-card"><h3>🧪 Sandbox</h3><p>Cria uma cópia isolada da sessão local. Arquivos criados e removidos ali são descartados ao sair.</p><button class="ui-btn" onclick="toggleSandbox()">Ativar / Desativar</button><button class="ui-btn" onclick="resetSandbox()">Resetar</button></div>
+        <div class="settings-card"><h3>⌨️ Terminal</h3><p>Atalhos úteis: Ctrl+L limpa, TAB completa, ↑ e ↓ navegam no histórico.</p><button class="ui-btn" onclick="setTermScale(12)">Fonte P</button><button class="ui-btn" onclick="setTermScale(13)">Fonte M</button><button class="ui-btn" onclick="setTermScale(15)">Fonte G</button></div>
+        <div class="settings-card"><h3>📌 Estado</h3><div class="status-row"><span class="shell-chip" id="settings-host">host: local</span><span class="shell-chip" id="settings-path">cwd: ~</span></div><p style="margin-top:10px">Comandos novos: <b>sandbox</b>, <b>tree</b>, <b>stat</b>, <b>ll</b>.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCK -->
+  <div id="dock">
+    <div class="dock-app" onclick="openWindow('win-term')" title="Terminal">
+      <span>🖥️</span><div class="tooltip">Terminal</div><div class="dock-indicator"></div>
+    </div>
+    <div class="dock-app" onclick="openWindow('win-files')"><span>📁</span><div class="tooltip">Arquivos</div></div>
+    <div class="dock-app" onclick="openWindow('win-sysmon')"><span>📊</span><div class="tooltip">Monitor</div></div>
+    <div class="dock-sep"></div>
+    <div class="dock-app" onclick="showLesson()"><span>📖</span><div class="tooltip">Manual Linux</div></div>
+    <div class="dock-app" onclick="openSettings()"><span>⚙️</span><div class="tooltip">Configurações</div></div>
+  </div>
+
+</div><!-- /desktop -->
+</div><!-- /os -->
+<div id="notifications"></div>
+<div id="file-preview" class="file-preview" onclick="if(event.target===this)closeFilePreview()"><div class="file-preview-box"><div class="file-preview-head"><strong id="file-preview-title">Arquivo</strong><button class="man-close" onclick="closeFilePreview()">✕ fechar</button></div><div id="file-preview-content"></div></div></div>
+
+<!-- LESSON MODAL -->
+<div id="lesson-modal">
+  <div class="lesson-box">
+    <h2>📖 Referência de Comandos Linux</h2>
+    <div class="lesson-sub">Guia rápido para navegar e operar o terminal</div>
+    <div class="lesson-section">
+      <h3>Navegação</h3>
+      <div class="lesson-row"><span class="lesson-cmd">pwd</span><div class="lesson-desc">Mostra o caminho do diretório atual<div class="lesson-example"># Exemplo: /home/root/documentos</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">ls</span><div class="lesson-desc">Lista arquivos e pastas do diretório atual<div class="lesson-example">ls -la  # lista detalhada com arquivos ocultos</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">cd [dir]</span><div class="lesson-desc">Muda para o diretório especificado<div class="lesson-example">cd ..  (pai) | cd ~  (home) | cd /  (raiz)</div></div></div>
+    </div>
+    <div class="lesson-section">
+      <h3>Arquivos</h3>
+      <div class="lesson-row"><span class="lesson-cmd">cat [arq]</span><div class="lesson-desc">Exibe o conteúdo de um arquivo</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">touch [arq]</span><div class="lesson-desc">Cria arquivo vazio ou atualiza timestamp</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">mkdir [dir]</span><div class="lesson-desc">Cria um novo diretório<div class="lesson-example">mkdir -p a/b/c  # cria estrutura aninhada</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">rm [arq]</span><div class="lesson-desc">Remove arquivo<div class="lesson-example">rm -r pasta/  # remove pasta recursivamente</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">cp src dst</span><div class="lesson-desc">Copia arquivo ou diretório</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">mv src dst</span><div class="lesson-desc">Move ou renomeia arquivo</div></div>
+    </div>
+    <div class="lesson-section">
+      <h3>Texto & Busca</h3>
+      <div class="lesson-row"><span class="lesson-cmd">echo "txt"</span><div class="lesson-desc">Imprime texto — use &gt; para salvar em arquivo<div class="lesson-example">echo "olá" > arquivo.txt</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">grep txt arq</span><div class="lesson-desc">Busca padrão em arquivos<div class="lesson-example">grep -r "senha" /etc/  # busca recursiva</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">find / -name</span><div class="lesson-desc">Encontra arquivos pelo nome</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">wc -l arq</span><div class="lesson-desc">Conta linhas de um arquivo</div></div>
+    </div>
+    <div class="lesson-section">
+      <h3>Sistema</h3>
+      <div class="lesson-row"><span class="lesson-cmd">whoami</span><div class="lesson-desc">Mostra o usuário logado</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">uname -a</span><div class="lesson-desc">Informações do kernel e sistema</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">ps aux</span><div class="lesson-desc">Lista processos em execução</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">top</span><div class="lesson-desc">Monitor de processos em tempo real</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">df -h</span><div class="lesson-desc">Uso de espaço em disco</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">chmod +x</span><div class="lesson-desc">Adiciona permissão de execução a um arquivo</div></div>
+    </div>
+    <div class="lesson-section">
+      <h3>Rede (modo simulado)</h3>
+      <div class="lesson-row"><span class="lesson-cmd">scan</span><div class="lesson-desc">Simula varredura ARP na sub-rede local</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">ping [ip]</span><div class="lesson-desc">Testa conectividade com um host</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">ssh user@ip</span><div class="lesson-desc">Conecta a máquina remota via SSH</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">crack [ip]</span><div class="lesson-desc">Simula ataque de força bruta SSH (modo educativo)</div></div>
+    </div>
+    <button class="lesson-close" onclick="closeLesson()">Fechar</button>
+  </div>
+</div>
+
+<!-- MAN PAGE MODAL -->
+<div id="man-modal">
+  <div class="man-box">
+    <button class="man-close" onclick="document.getElementById('man-modal').classList.remove('open')">✕ fechar</button>
+    <h1 id="man-title"></h1>
+    <div id="man-content"></div>
+  </div>
+</div>
+
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ───── FILE SYSTEM ─────
+class FNode {
+  constructor(name, type, parent=null, content="", perms="rw-r--r--") {
+    this.name=name; this.type=type; this.parent=parent;
+    this.children={}; this.content=content; this.perms=perms;
+    this.mtime=new Date();
+  }
+}
+class VM {
+  constructor(hostname, ip, user, isRemote=false) {
+    this.hostname=hostname; this.ip=ip; this.user=user; this.isRemote=isRemote;
+    this.root=new FNode("/","dir");
+    const addDir=(parent,name,perms="rwxr-xr-x")=>{const n=new FNode(name,"dir",parent,"",perms);parent.children[name]=n;return n};
+    const addFile=(parent,name,content,perms="rw-r--r--")=>{const n=new FNode(name,"file",parent,content,perms);parent.children[name]=n;return n};
+    const home=addDir(this.root,"home");
+    const userDir=addDir(home,user);
+    const etc=addDir(this.root,"etc");
+    const bin=addDir(this.root,"bin");
+    const var_=addDir(this.root,"var");
+    const tmp=addDir(this.root,"tmp");
+    addFile(etc,"hostname",hostname+"\n");
+    addFile(etc,"os-release",'NAME="TermHacker OS"\nVERSION="6.0"\nID=termhacker\nPRETTY_NAME="TermHacker OS 6.0 (Focal)"');
+    addFile(etc,"passwd",`root:x:0:0:root:/root:/bin/bash\n${user}:x:1000:1000:${user}:/home/${user}:/bin/bash`);
+    if(!isRemote) {
+      const docs=addDir(userDir,"documentos");
+      const proj=addDir(userDir,"projetos");
+      addFile(docs,"notas.txt","# Anotações pessoais\n\nAprender Linux é essencial para qualquer dev.\n\nComandos do dia:\n- ls, cd, mkdir\n- cat, echo, grep\n- chmod, ps, top");
+      addFile(docs,"readme.md","# Bem-vindo ao TermHacker OS!\n\nEste é um ambiente Linux educativo.\nExplore o sistema de arquivos!");
+      addFile(proj,"script.sh","#!/bin/bash\n# Script de exemplo\necho 'Olá, Linux!'\nfor i in 1 2 3; do\n  echo \"Iteração $i\"\ndone","rwxr-xr-x");
+      addFile(tmp,".bash_history","ls\ncd documentos\ncat notas.txt\ngrep -r senha .");
+    } else {
+      const db=addDir(userDir,"database");
+      const logs=addDir(var_,"log");
+      addFile(db,"users.db","id,username,email,hash\n1,admin,admin@zeus.srv,5f4dcc3b5\n2,joao,joao@zeus.srv,e10adc3949\n3,maria,maria@zeus.srv,d8578edf8\n4,carlos,carlos@zeus.srv,25d55ad28");
+      addFile(db,"config.json",'{\n  "db_host": "localhost",\n  "db_port": 5432,\n  "db_name": "produção",\n  "secret_key": "s3cr3t_k3y_n4o_c0mpartilhe"\n}');
+      addFile(logs,"auth.log","May 18 09:01:02 zeus sshd[1337]: Accepted password for admin from 192.168.0.10 port 52211\nMay 18 09:05:14 zeus sudo: admin ran: cat /etc/passwd\nMay 18 09:08:32 zeus sshd[1338]: Failed password from 192.168.0.99 port 44312");
+      addFile(logs,"access.log","[09:00] 192.168.0.1 GET /index.html 200\n[09:01] 192.168.0.10 POST /login 200\n[09:05] 192.168.0.42 GET /admin 403\n[09:08] 192.168.0.99 POST /login 401");
+      addFile(var_,"motd","Bem-vindo ao Zeus Server v2.1\nUso não autorizado é crime. Acesso monitorado.");
+    }
+    this.currentDir=userDir;
+    this.env={PATH:"/bin:/usr/bin",HOME:`/home/${user}`,USER:user,SHELL:"/bin/bash",TERM:"xterm-256color"};
+  }
+}
+
+const localPC=new VM("termhacker","192.168.0.10","root",false);
+const remoteServer=new VM("zeus-server","192.168.0.42","admin",true);
+let machine=localPC;
+let sandboxMode=false;
+let sandboxPC=null;
+let activeShellProfile="main";
+
+function getHomeDir(vm=machine){return vm.root.children.home.children[vm.user];}
+function cloneNode(node,parent=null){
+  const copy=new FNode(node.name,node.type,parent,node.content,node.perms);
+  copy.mtime=new Date(node.mtime);
+  copy.children={};
+  Object.values(node.children||{}).forEach(child=>{copy.children[child.name]=cloneNode(child,copy);});
+  return copy;
+}
+function cloneVM(vm,label="sandbox"){
+  const copy=Object.create(VM.prototype);
+  copy.hostname=label==="sandbox"?vm.hostname+"-box":vm.hostname;
+  copy.ip=vm.ip;
+  copy.user=vm.user;
+  copy.isRemote=false;
+  copy.root=cloneNode(vm.root,null);
+  copy.currentDir=copy.root.children.home.children[copy.user];
+  copy.env={...vm.env, SANDBOX:"1", HOSTNAME:copy.hostname};
+  return copy;
+}
+function notify(title,body){
+  const wrap=document.getElementById("notifications");
+  if(!wrap)return;
+  const el=document.createElement("div");el.className="toast";
+  el.innerHTML=`<div class="toast-title">${title}</div><div class="toast-body">${body}</div>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{el.style.opacity="0";el.style.transform="translateY(10px)";el.style.transition=".25s";},3600);
+  setTimeout(()=>el.remove(),3900);
+}
+function updateSandboxUI(){
+  const top=document.getElementById("sandbox-top"); if(top)top.textContent=sandboxMode?"ON":"OFF";
+  const chip=document.getElementById("sandbox-chip"); if(chip){chip.textContent=sandboxMode?"🧪 Sandbox ON":"🧪 Sandbox OFF";chip.classList.toggle("active",sandboxMode);}
+  const quick=document.getElementById("quick-sandbox-label"); if(quick)quick.textContent=sandboxMode?"Ativado":"Desativado";
+  const banner=document.getElementById("sandbox-banner"); if(banner)banner.classList.toggle("active",sandboxMode);
+}
+function syncFileManagerToMachine(){
+  if(!fmNode||machine===sandboxPC||machine===localPC||machine===remoteServer){fmNode=getHomeDir(machine);}
+  renderFM();
+}
+function toggleSandbox(){
+  if(machine.isRemote){notify("Sandbox indisponível","Saia da sessão SSH antes de alternar o ambiente isolado.");return;}
+  if(!sandboxMode){
+    sandboxPC=cloneVM(localPC,"sandbox");
+    machine=sandboxPC;sandboxMode=true;activeShellProfile="sandbox";
+    notify("Sandbox ativado","Você está em uma cópia isolada da sessão local. Alterações serão descartadas ao sair.");
+  }else{
+    machine=localPC;sandboxMode=false;sandboxPC=null;activeShellProfile="main";
+    notify("Sandbox encerrado","A sessão principal foi restaurada e as alterações isoladas foram descartadas.");
+  }
+  updateSandboxUI();renderPrompt();syncFileManagerToMachine();
+}
+function resetSandbox(){
+  if(!sandboxMode){notify("Sandbox inativo","Ative o sandbox antes de resetá-lo.");return;}
+  sandboxPC=cloneVM(localPC,"sandbox");machine=sandboxPC;activeShellProfile="sandbox";
+  updateSandboxUI();renderPrompt();syncFileManagerToMachine();
+  notify("Sandbox resetado","O ambiente isolado voltou ao estado inicial.");
+}
+
+function getFullPath(dir){
+  let p=[],c=dir;
+  while(c.parent!==null){p.unshift(c.name);c=c.parent}
+  return "/"+p.join("/");
+}
+function getDisplayPath(dir){
+  const fp=getFullPath(dir);
+  const home=`/home/${machine.user}`;
+  if(fp===home)return "~";
+  if(fp.startsWith(home+"/"))return "~"+fp.slice(home.length);
+  return fp;
+}
+function resolveNode(path){
+  if(!path)return machine.currentDir;
+  let cur;
+  if(path.startsWith("/"))cur=machine.root;
+  else if(path.startsWith("~")){cur=machine.root.children.home.children[machine.user];path=path.slice(1)||"";}
+  else cur=machine.currentDir;
+  if(!path||path==="/")return cur;
+  const parts=path.replace(/^\//,"").split("/").filter(Boolean);
+  for(const p of parts){
+    if(p===".")continue;
+    if(p===".."){if(cur.parent)cur=cur.parent;continue;}
+    if(!cur.children[p])return null;
+    cur=cur.children[p];
+  }
+  return cur;
+}
+
+// ───── TERMINAL ─────
+const output=document.getElementById("term-output");
+const realInput=document.getElementById("real-input");
+const cmdDisplay=document.getElementById("cmd-display");
+const promptLabel=document.getElementById("term-prompt-label");
+let cmdHistory=[],histIdx=-1,isProcessing=false,tabIndex=0;
+
+function renderPrompt(){
+  const p=getDisplayPath(machine.currentDir);
+  const color=machine.isRemote?"var(--red)":"var(--green)";
+  promptLabel.innerHTML=`<span style="color:${color};font-weight:700">${machine.user}@${machine.hostname}</span><span style="color:var(--text3)">:</span><span style="color:var(--accent)">${p}</span><span style="color:var(--text2)"> $ </span>`;
+  document.getElementById("win-term-title").textContent=`${machine.user}@${machine.hostname}: ${p}`;
+  const nb=document.getElementById("net-badge");
+  const ni=document.getElementById("net-indicator");
+  if(machine.isRemote){
+    nb.className="mission-badge badge-remote"; nb.textContent="SSH: "+machine.ip;
+    ni.textContent="SSH";ni.style.color="var(--red)";
+  } else if(sandboxMode){
+    nb.className="mission-badge badge-local"; nb.textContent="SANDBOX";
+    ni.textContent="ISOLADO";ni.style.color="var(--yellow)";
+  } else {
+    nb.className="mission-badge badge-local"; nb.textContent="LOCAL";
+    ni.textContent="LOCAL";ni.style.color="var(--accent)";
+  }
+  const hostBadge=document.getElementById("settings-host");if(hostBadge)hostBadge.textContent=`host: ${machine.hostname}`;
+  const pathBadge=document.getElementById("settings-path");if(pathBadge)pathBadge.textContent=`cwd: ${p}`;
+  updateSandboxUI();
+}
+
+function printLine(html,cls=""){
+  const d=document.createElement("div");
+  d.className="term-line "+(cls||"");
+  d.innerHTML=html;
+  output.appendChild(d);
+  output.scrollTop=output.scrollHeight;
+}
+function printBlank(){printLine("")}
+
+function colorLS(node){
+  if(node.type==="dir")return `<span class="t-dir">${node.name}/</span>`;
+  if(node.perms.startsWith("rwx"))return `<span class="t-exec">${node.name}*</span>`;
+  return `<span class="t-file">${node.name}</span>`;
+}
+
+// ───── COMMANDS ─────
+const manPages={
+  ls:{name:"LS(1)",synopsis:"ls [OPÇÃO]... [ARQUIVO]...",desc:"Lista informações sobre os ARQUIVOs (do diretório atual por padrão).",opts:["-a  listar entradas ocultas começando com .  ","-l  usar formato de listagem longa","-h  tamanhos legíveis (1K 234M 2G)  ","-r  inverter ordem de classificação","-t  ordenar por data de modificação"]},
+  cd:{name:"CD(1)",synopsis:"cd [DIR]",desc:"Muda o diretório de trabalho do shell para DIR.",opts:["..  sobe um nível","/   vai para a raiz","~   vai para home"]},
+  cat:{name:"CAT(1)",synopsis:"cat [OPÇÃO]... [ARQUIVO]...",desc:"Concatena arquivos e imprime na saída padrão.",opts:["-n  numera todas as linhas de saída","-A  mostra todos os caracteres especiais"]},
+  grep:{name:"GREP(1)",synopsis:"grep [OPÇÃO]... PADRÃO [ARQUIVO]...",desc:"Busca PADRÃO em cada ARQUIVO e imprime as linhas correspondentes.",opts:["-r  recursivo em diretórios","-i  ignora diferença de maiúsculas","-n  imprime número da linha","-c  conta ocorrências","-v  inverte correspondência (linhas que NÃO contêm)"]},
+  chmod:{name:"CHMOD(1)",synopsis:"chmod [MODO] ARQUIVO",desc:"Altera as permissões de acesso de um arquivo.",opts:["chmod +x arq  adiciona execução","chmod 755 arq  rwxr-xr-x","chmod 644 arq  rw-r--r--","chmod 600 arq  rw------- (privado)"]},
+};
+
+const cmds={
+  help:{desc:"Lista comandos",exec:async()=>{
+    const list=Object.entries(cmds).map(([k,v])=>`  <span style="color:var(--accent);font-weight:500">${k.padEnd(10)}</span> <span style="color:var(--text3)">—</span> ${v.desc}`).join("\n");
+    return `<span style="color:var(--text2)">Comandos disponíveis:</span>\n${list}\n\n<span style="color:var(--text3)">Use <span style="color:var(--yellow)">man [cmd]</span> para detalhes. Use <span style="color:var(--yellow)">TAB</span> para autocompletar.</span>`;
+  }},
+  man:{desc:"Manual de um comando",exec:async(args)=>{
+    if(!args[0])return`<span class="t-err">Uso: man [comando]</span>`;
+    const p=manPages[args[0]];
+    if(!p)return`<span class="t-err">Nenhuma entrada de manual para '${args[0]}'</span>`;
+    showManPage(p);return null;
+  }},
+  clear:{desc:"Limpa o terminal",exec:async()=>{output.innerHTML="";return null}},
+  whoami:{desc:"Usuário atual",exec:async()=>machine.user},
+  hostname:{desc:"Nome do host",exec:async()=>machine.hostname},
+  uname:{desc:"Informações do sistema",exec:async(args)=>{
+    const full=`Linux ${machine.hostname} 6.1.0-termhacker #1 SMP PREEMPT Thu May 18 00:00:00 UTC 2026 x86_64 GNU/Linux`;
+    return args.includes("-a")?full:`Linux`;
+  }},
+  date:{desc:"Data e hora atual",exec:async()=>new Date().toString()},
+  uptime:{desc:"Tempo ativo do sistema",exec:async()=>" 09:42:01 up 2:13, 1 user, load average: 0.12, 0.08, 0.05"},
+  sandbox:{desc:"Liga, desliga ou reseta o modo sandbox",exec:async(args)=>{
+    const mode=(args[0]||"status").toLowerCase();
+    if(mode==="on"&&!sandboxMode){toggleSandbox();return`<span class="t-ok">Sandbox ativado.</span>`;}
+    if(mode==="off"&&sandboxMode){toggleSandbox();return`<span class="t-ok">Sandbox desativado.</span>`;}
+    if(mode==="reset"){resetSandbox();return sandboxMode?`<span class="t-ok">Sandbox resetado.</span>`:`<span class="t-warn">Ative o sandbox antes de resetar.</span>`;}
+    if(mode==="status")return sandboxMode?`<span class="t-ok">Sandbox: ON</span> — ambiente isolado ativo.`:`<span class="t-warn">Sandbox: OFF</span> — sessão principal ativa.`;
+    return`Uso: sandbox [on|off|reset|status]`;
+  }},
+  tree:{desc:"Mostra diretórios em árvore",exec:async(args)=>{
+    const root=args[0]?resolveNode(args[0]):machine.currentDir;
+    if(!root)return`<span class="t-err">tree: caminho não encontrado</span>`;
+    const lines=[getFullPath(root)];
+    function walk(node,prefix=""){
+      const children=Object.values(node.children||{});
+      children.forEach((child,i)=>{
+        const last=i===children.length-1;
+        lines.push(prefix+(last?"└── ":"├── ")+(child.type==="dir"?child.name+"/":child.name));
+        if(child.type==="dir")walk(child,prefix+(last?"    ":"│   "));
+      });
+    }
+    walk(root);return lines.join("\n");
+  }},
+  stat:{desc:"Mostra metadados de um arquivo",exec:async(args)=>{
+    if(!args[0])return`<span class="t-err">Uso: stat [arquivo]</span>`;
+    const n=resolveNode(args[0]);
+    if(!n)return`<span class="t-err">stat: '${args[0]}': não encontrado</span>`;
+    return`Arquivo: ${n.name}\nTipo: ${n.type==="dir"?"diretório":"arquivo"}\nPermissões: ${n.perms}\nTamanho: ${(n.content||"").length} bytes\nModificado: ${n.mtime.toLocaleString("pt-BR")}`;
+  }},
+  id:{desc:"UID e grupos do usuário",exec:async()=>`uid=0(${machine.user}) gid=0(${machine.user}) groups=0(${machine.user}),4(adm),24(cdrom),27(sudo)`},
+  env:{desc:"Variáveis de ambiente",exec:async()=>Object.entries(machine.env).map(([k,v])=>`<span style="color:var(--accent)">${k}</span>=<span style="color:var(--text2)">${v}</span>`).join("\n")},
+  echo:{desc:"Imprime/salva texto",exec:async(args,full)=>{
+    if(full.includes(">")){
+      const [left,right]=full.split(">");
+      const txt=left.replace(/^echo\s*/i,"").trim().replace(/^["'`](.*)["'`]$/,"$1");
+      const fname=right.trim();
+      if(fname){machine.currentDir.children[fname]=new FNode(fname,"file",machine.currentDir,txt);return``}
+    }
+    return args.join(" ").replace(/^["'`](.*)["'`]$/,"$1");
+  }},
+  pwd:{desc:"Caminho atual",exec:async()=>getFullPath(machine.currentDir)},
+  ls:{desc:"Lista arquivos",exec:async(args)=>{
+    const showHidden=args.includes("-a")||args.includes("-la")||args.includes("-al");
+    const longFmt=args.includes("-l")||args.includes("-la")||args.includes("-al");
+    const targetPath=args.find(a=>!a.startsWith("-"));
+    const dir=targetPath?resolveNode(targetPath):machine.currentDir;
+    if(!dir)return`<span class="t-err">ls: não pode acessar '${targetPath}': Não existe</span>`;
+    if(dir.type!=="dir")return`<span class="t-err">ls: '${targetPath}': Não é um diretório</span>`;
+    let entries=Object.values(dir.children);
+    if(!showHidden)entries=entries.filter(n=>!n.name.startsWith("."));
+    if(entries.length===0)return"";
+    if(longFmt){
+      const lines=entries.map(n=>{
+        const t=n.type==="dir"?"d":"-";
+        const col=n.type==="dir"?"t-dir":n.perms.startsWith("rwx")?"t-exec":"t-file";
+        const d=n.mtime.toLocaleDateString("pt-BR",{month:"short",day:"2-digit"});
+        return `${t}${n.perms} 1 ${machine.user} ${machine.user} ${(n.content||"").length.toString().padStart(6)} ${d} <span class="${col}">${n.name}${n.type==="dir"?"/":(n.perms.startsWith("rwx")?"*":"")}</span>`;
+      });
+      return`total ${entries.length}\n`+lines.join("\n");
+    }
+    return entries.map(colorLS).join("  ");
+  }},
+  cd:{desc:"Muda diretório",exec:async(args)=>{
+    const t=args[0];
+    if(!t||t==="~"){machine.currentDir=machine.root.children.home.children[machine.user];return""}
+    if(t==="/"){machine.currentDir=machine.root;return""}
+    const node=resolveNode(t);
+    if(!node)return`<span class="t-err">cd: ${t}: Diretório não encontrado</span>`;
+    if(node.type!=="dir")return`<span class="t-err">cd: ${t}: Não é um diretório</span>`;
+    machine.currentDir=node;return"";
+  }},
+  mkdir:{desc:"Cria diretório",exec:async(args)=>{
+    if(!args.length)return`<span class="t-err">Uso: mkdir [nome]</span>`;
+    const nm=args[args.length-1];
+    if(machine.currentDir.children[nm])return`<span class="t-err">mkdir: '${nm}': Já existe</span>`;
+    machine.currentDir.children[nm]=new FNode(nm,"dir",machine.currentDir);return"";
+  }},
+  touch:{desc:"Cria/atualiza arquivo",exec:async(args)=>{
+    if(!args.length)return`<span class="t-err">Uso: touch [arquivo]</span>`;
+    if(!machine.currentDir.children[args[0]])machine.currentDir.children[args[0]]=new FNode(args[0],"file",machine.currentDir);
+    else machine.currentDir.children[args[0]].mtime=new Date();
+    return"";
+  }},
+  cat:{desc:"Exibe conteúdo de arquivo",exec:async(args)=>{
+    if(!args.length)return`<span class="t-err">Uso: cat [arquivo]</span>`;
+    const n=resolveNode(args[0]);
+    if(!n)return`<span class="t-err">cat: ${args[0]}: Arquivo não encontrado</span>`;
+    if(n.type==="dir")return`<span class="t-err">cat: ${args[0]}: É um diretório</span>`;
+    const numbered=args.includes("-n");
+    const lines=n.content.split("\n");
+    if(numbered)return lines.map((l,i)=>`<span style="color:var(--text3)">${String(i+1).padStart(4)}  </span>${l}`).join("\n");
+    return n.content;
+  }},
+  rm:{desc:"Remove arquivo",exec:async(args)=>{
+    if(!args.length)return`<span class="t-err">Uso: rm [arquivo]</span>`;
+    const fname=args.find(a=>!a.startsWith("-"));
+    const recursive=args.includes("-r")||args.includes("-rf");
+    const n=machine.currentDir.children[fname];
+    if(!n)return`<span class="t-err">rm: '${fname}': Não encontrado</span>`;
+    if(n.type==="dir"&&!recursive)return`<span class="t-err">rm: '${fname}': É um diretório. Use -r para remover</span>`;
+    delete machine.currentDir.children[fname];return"";
+  }},
+  cp:{desc:"Copia arquivo",exec:async(args)=>{
+    if(args.length<2)return`<span class="t-err">Uso: cp origem destino</span>`;
+    const src=resolveNode(args[0]);
+    if(!src||src.type==="dir")return`<span class="t-err">cp: '${args[0]}': Não encontrado ou é diretório</span>`;
+    machine.currentDir.children[args[1]]=new FNode(args[1],"file",machine.currentDir,src.content,src.perms);
+    return"";
+  }},
+  mv:{desc:"Move/renomeia arquivo",exec:async(args)=>{
+    if(args.length<2)return`<span class="t-err">Uso: mv origem destino</span>`;
+    const n=machine.currentDir.children[args[0]];
+    if(!n)return`<span class="t-err">mv: '${args[0]}': Não encontrado</span>`;
+    n.name=args[1];machine.currentDir.children[args[1]]=n;
+    delete machine.currentDir.children[args[0]];return"";
+  }},
+  grep:{desc:"Busca texto em arquivo",exec:async(args)=>{
+    const opts=args.filter(a=>a.startsWith("-"));
+    const rest=args.filter(a=>!a.startsWith("-"));
+    if(rest.length<2)return`<span class="t-err">Uso: grep [opts] "texto" arquivo</span>`;
+    const term=rest[0].replace(/^["']|["']$/g,"");
+    const fname=rest[1];
+    const n=resolveNode(fname);
+    if(!n)return`<span class="t-err">grep: '${fname}': Não encontrado</span>`;
+    if(n.type==="dir")return`<span class="t-err">grep: '${fname}': É um diretório</span>`;
+    const ci=opts.includes("-i");
+    const showNum=opts.includes("-n");
+    const matches=n.content.split("\n").map((l,i)=>({l,i})).filter(({l})=>ci?l.toLowerCase().includes(term.toLowerCase()):l.includes(term));
+    if(!matches.length)return"";
+    return matches.map(({l,i})=>{
+      const hl=l.replace(new RegExp(term,"gi"),m=>`<span class="t-highlight">${m}</span>`);
+      return showNum?`<span style="color:var(--text3)">${i+1}:</span>${hl}`:hl;
+    }).join("\n");
+  }},
+  find:{desc:"Encontra arquivos",exec:async(args)=>{
+    const name=args[args.indexOf("-name")+1];
+    if(!name)return`<span class="t-err">Uso: find [dir] -name "padrão"</span>`;
+    const results=[];
+    function walk(node,path){
+      for(const[k,v]of Object.entries(node.children)){
+        const fp=path+"/"+k;
+        if(k.includes(name.replace(/['"]/g,"")||name))results.push(fp);
+        if(v.type==="dir")walk(v,fp);
+      }
+    }
+    walk(machine.root,"");
+    return results.length?results.join("\n"):`<span class="t-err">Nenhum resultado para '${name}'</span>`;
+  }},
+  wc:{desc:"Conta linhas/palavras",exec:async(args)=>{
+    const fname=args.find(a=>!a.startsWith("-"));
+    if(!fname)return`<span class="t-err">Uso: wc [-l|-w|-c] arquivo</span>`;
+    const n=resolveNode(fname);
+    if(!n||n.type==="dir")return`<span class="t-err">wc: arquivo não encontrado</span>`;
+    const lines=n.content.split("\n").length;
+    const words=n.content.split(/\s+/).filter(Boolean).length;
+    const chars=n.content.length;
+    if(args.includes("-l"))return`${lines} ${fname}`;
+    if(args.includes("-w"))return`${words} ${fname}`;
+    if(args.includes("-c"))return`${chars} ${fname}`;
+    return`${lines} ${words} ${chars} ${fname}`;
+  }},
+  chmod:{desc:"Permissões de arquivo",exec:async(args)=>{
+    if(args.length<2)return`<span class="t-err">Uso: chmod [modo] arquivo</span>`;
+    const n=resolveNode(args[1]);
+    if(!n)return`<span class="t-err">chmod: '${args[1]}': Não encontrado</span>`;
+    if(args[0]==="+x"){n.perms="rwxr-xr-x";return`<span class="t-ok">${args[1]}: permissão de execução adicionada</span>`}
+    if(args[0]==="755"){n.perms="rwxr-xr-x";return""}
+    if(args[0]==="644"){n.perms="rw-r--r--";return""}
+    if(args[0]==="600"){n.perms="rw-------";return""}
+    return`<span class="t-err">chmod: modo '${args[0]}' não reconhecido</span>`;
+  }},
+  df:{desc:"Uso de disco",exec:async()=>`Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        28G   8.2G  18G  32% /\ntmpfs           2.0G     0  2.0G   0% /dev/shm`},
+  ps:{desc:"Lista processos",exec:async()=>`PID TTY          TIME CMD\n  1 ?        00:00:02 systemd\n 42 ?        00:00:00 sshd\n${Math.floor(Math.random()*9000+1000)} pts/0    00:00:00 bash\n${Math.floor(Math.random()*9000+1000)} pts/0    00:00:00 ps`},
+  top:{desc:"Monitor de processos",exec:async()=>{
+    openWindow("win-sysmon");
+    return`<span class="t-info">[Monitor aberto na janela lateral]</span>`;
+  }},
+  ping:{desc:"Testa conectividade",exec:async(args)=>{
+    if(!args[0])return`<span class="t-err">Uso: ping [host/ip]</span>`;
+    printLine(`PING ${args[0]}: 56 bytes de dados`);
+    for(let i=1;i<=4;i++){await sleep(400);printLine(`64 bytes from ${args[0]}: icmp_seq=${i} ttl=64 time=${(Math.random()*3+0.5).toFixed(2)} ms`);}
+    return`\n--- ${args[0]} ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss`;
+  }},
+  history:{desc:"Histórico de comandos",exec:async()=>cmdHistory.map((c,i)=>`<span style="color:var(--text3)">${String(i+1).padStart(4)}  </span>${c}`).join("\n")},
+  // HACKING CMDS
+  scan:{desc:"[NET] Varre rede local",exec:async()=>{
+    if(machine.isRemote)return`<span class="t-err">scan: disponível apenas no localhost</span>`;
+    printLine(`<span class="t-sys">Iniciando varredura ARP — sub-rede 192.168.0.0/24</span>`);
+    const hosts=[{ip:"192.168.0.1",host:"gateway",ports:"80,443"},{ip:"192.168.0.10",host:"termhacker",ports:"22,80"},{ip:"192.168.0.42",host:"zeus-server",ports:"22,80,5432"}];
+    for(const h of hosts){
+      await sleep(600);
+      printLine(`  <span class="t-ok">[+]</span> ${h.ip.padEnd(16)} <span style="color:var(--text3)">${h.host.padEnd(14)}</span> <span style="color:var(--yellow)">portas: ${h.ports}</span>`);
+    }
+    return`\n<span style="color:var(--text2)">3 hosts encontrados. Alvo interessante: <span class="t-warn">192.168.0.42</span> (porta 22 aberta)</span>`;
+  }},
+  crack:{desc:"[NET] Força bruta SSH",exec:async(args)=>{
+    if(machine.isRemote)return`<span class="t-err">Indisponível remotamente</span>`;
+    if(!args[0])return`<span class="t-err">Uso: crack [IP]</span>`;
+    if(args[0]!==remoteServer.ip)return`<span class="t-err">Alvo fora de alcance</span>`;
+    printLine(`<span style="color:var(--red)">Iniciando Hydra v9.4 — ataque de dicionário SSH contra ${args[0]}</span>`);
+    const wordlist=["admin","root","123456","password","ubuntu","qwerty","zeus2024","senha123"];
+    for(const w of wordlist){
+      await sleep(400);
+      const hit=w==="senha123";
+      printLine(`  <span style="color:var(--text3)">[HYDRA]</span> user:admin pass:<span style="color:var(--yellow)">${w}</span> → <span class="${hit?"t-ok":"t-err"}">${hit?"SUCESSO!":"FALHOU"}</span>`);
+      if(hit){await sleep(300);return`\n<span class="t-ok">[!] CREDENCIAIS ENCONTRADAS</span>\n  Host: ${args[0]}\n  User: <span style="color:var(--accent)">admin</span>\n  Pass: <span style="color:var(--yellow)">senha123</span>`;}
+    }
+    return`<span class="t-err">Wordlist esgotada.</span>`;
+  }},
+  ssh:{desc:"[NET] Conecta via SSH",exec:async(args)=>{
+    if(sandboxMode)return`<span class="t-warn">ssh bloqueado no sandbox: saia do ambiente isolado para abrir uma sessão remota.</span>`;
+    if(!args[0])return`<span class="t-err">Uso: ssh user@host</span>`;
+    const [user,ip]=(args[0].includes("@")?args[0]:"").split("@");
+    if(ip!==remoteServer.ip||user!==remoteServer.user)return`<span class="t-err">ssh: connect to host ${ip||args[0]} port 22: Connection refused</span>`;
+    printLine(`<span class="t-sys">The authenticity of host '${ip}' can't be established.</span>`);
+    printLine(`<span class="t-sys">ECDSA key fingerprint is SHA256:xN2kP3m...</span>`);
+    printLine(`<span class="t-sys">Are you sure you want to continue connecting (yes/no)? yes</span>`);
+    await sleep(600);
+    printLine(`<span class="t-sys">Warning: Permanently added '${ip}' to known hosts.</span>`);
+    await sleep(400);
+    printLine(`<span class="t-sys">admin@${ip}'s password: (oculta)</span>`);
+    await sleep(700);
+    machine=remoteServer;
+    fmNode=getHomeDir(machine);
+    renderFM();
+    const motd=remoteServer.root.children.var?.children?.motd;
+    if(motd)printLine(`\n<span style="color:var(--yellow)">${motd.content}</span>\n`);
+    return`<span class="t-ok">Conexão SSH estabelecida ✓</span>`;
+  }},
+  exit:{desc:"Encerra sessão/SSH",exec:async()=>{
+    if(!machine.isRemote)return`<span class="t-err">logout: sem sessão ativa para encerrar</span>`;
+    printLine(`<span class="t-sys">Connection to ${machine.ip} closed.</span>`);
+    await sleep(400);machine=localPC;fmNode=getHomeDir(machine);renderFM();
+    return`<span class="t-ok">Retornando ao localhost...</span>`;
+  }},
+  theme:{desc:"Muda tema (cyan/green/amber/red/purple)",exec:async(args)=>{
+    const names=["cyan","green","amber","red","purple","blue"];
+    if(!args[0]||!names.includes(args[0]))return`Temas: ${names.join(", ")}`;
+    applyTheme(args[0]);
+    return`<span class="t-ok">Tema aplicado: ${args[0]}</span>`;
+  }},
+  neofetch:{desc:"Info do sistema estilo hacker",exec:async()=>{
+    return`<span style="color:var(--accent)">       ___</span>              <span style="color:var(--text)">OS:</span> TermHacker OS 6.0
+<span style="color:var(--accent)">      (. .)</span>             <span style="color:var(--text)">Host:</span> ${machine.hostname}
+<span style="color:var(--accent)">      (   )</span>             <span style="color:var(--text)">Kernel:</span> 6.1.0-termhacker
+<span style="color:var(--accent)">       |||</span>              <span style="color:var(--text)">Shell:</span> bash 5.2.15
+<span style="color:var(--accent)">      _|||_</span>             <span style="color:var(--text)">CPU:</span> TermCPU @ 3.6GHz
+                         <span style="color:var(--text)">RAM:</span> 524M / 4096M
+                         <span style="color:var(--text)">User:</span> ${machine.user}@${machine.hostname}`;
+  }},
+};
+
+// ───── MISSIONS ─────
+const missions=[
+  {lvl:1,cat:"NAVEGAÇÃO",desc:"Bem-vindo! Comece verificando o conteúdo da pasta atual.",hint:"ls",check:c=>c==="ls"},
+  {lvl:2,cat:"NAVEGAÇÃO",desc:"Acesse a pasta <b>documentos</b> dentro do seu diretório.",hint:"cd documentos",check:c=>c.startsWith("cd ")&&machine.currentDir.name==="documentos"},
+  {lvl:3,cat:"ARQUIVOS",desc:"Leia o conteúdo de <b>notas.txt</b>.",hint:"cat notas.txt",check:c=>c.includes("cat")&&c.includes("notas.txt")},
+  {lvl:4,cat:"ARQUIVOS",desc:"Volte para a pasta anterior com o caminho especial <b>..</b>",hint:"cd ..",check:c=>c==="cd .."},
+  {lvl:5,cat:"SISTEMA",desc:"Descubra informações completas do kernel com a flag correta.",hint:"uname -a",check:c=>c==="uname -a"},
+  {lvl:6,cat:"ARQUIVOS",desc:"Crie uma nova pasta chamada <b>hack</b>.",hint:"mkdir hack",check:c=>c==="mkdir hack"&&machine.currentDir.children["hack"]},
+  {lvl:7,cat:"TEXTO",desc:"Crie um arquivo de senhas via redirecionamento de texto.",hint:"echo \"senha123\" > pass.txt",check:c=>c.startsWith("echo ")&&c.includes("> pass.txt")&&machine.currentDir.children["pass.txt"]},
+  {lvl:8,cat:"BUSCA",desc:"Use grep para procurar por <b>Aprender</b> no arquivo notas.txt (ele está em documentos).",hint:'grep "Aprender" documentos/notas.txt',check:c=>c.startsWith("grep")&&c.includes("notas.txt")},
+  {lvl:9,cat:"REDE",desc:"Escaneie a rede em busca de hosts e portas abertas.",hint:"scan",check:c=>c==="scan"},
+  {lvl:10,cat:"PENTEST",desc:"Um servidor foi encontrado. Execute o ataque de força bruta.",hint:"crack 192.168.0.42",check:c=>c==="crack 192.168.0.42"},
+  {lvl:11,cat:"PENTEST",desc:"Credenciais obtidas! Estabeleça uma conexão SSH com o servidor.",hint:"ssh admin@192.168.0.42",check:c=>c==="ssh admin@192.168.0.42"},
+  {lvl:12,cat:"INFILTRAÇÃO",desc:"Você está no servidor remoto. Navegue até o banco de dados e leia <b>users.db</b>.",hint:"cd database && cat users.db",check:c=>(c.includes("cat")&&c.includes("users.db"))&&machine.isRemote},
+  {lvl:13,cat:"FURTIVIDADE",desc:"Apague seus rastros! Navegue até var/log e remova <b>auth.log</b>.",hint:"cd /var/log && rm auth.log",check:c=>c.includes("rm")&&c.includes("auth.log")&&machine.isRemote},
+  {lvl:14,cat:"CONCLUSÃO",desc:"Missão concluída. Encerre a sessão SSH e volte ao localhost.",hint:"exit",check:(c,out)=>c==="exit"&&!machine.isRemote},
+];
+let missionIdx=0;
+
+function updateMission(){
+  const total=missions.length;
+  document.getElementById("m-total").textContent=total;
+  if(missionIdx>=total){
+    document.getElementById("m-step").textContent=total;
+    document.getElementById("m-lvl").textContent="★";
+    document.getElementById("m-bar").style.width="100%";
+    document.getElementById("m-category").textContent="COMPLETO";
+    document.getElementById("m-desc").innerHTML=`<span style="color:var(--green);font-weight:600">🎉 Parabéns! Você completou todas as missões.</span><br><br>Você dominou navegação, manipulação de arquivos, busca e técnicas básicas de rede em Linux.`;
+    document.getElementById("m-hint").style.display="none";
+    return;
+  }
+  const m=missions[missionIdx];
+  document.getElementById("m-step").textContent=missionIdx+1;
+  document.getElementById("m-lvl").textContent=m.lvl;
+  document.getElementById("m-category").textContent=m.cat;
+  document.getElementById("m-desc").innerHTML=m.desc;
+  document.getElementById("m-bar").style.width=`${(missionIdx/total)*100}%`;
+  document.getElementById("m-hint").style.display="none";
+}
+function revealHint(){
+  if(missionIdx>=missions.length)return;
+  document.getElementById("m-hint-cmd").textContent=missions[missionIdx].hint;
+  document.getElementById("m-hint").style.display="block";
+}
+
+// ───── INPUT ─────
+realInput.addEventListener("input",()=>{cmdDisplay.textContent=realInput.value;showAutocomplete();});
+realInput.addEventListener("keydown",async e=>{
+  if(e.key==="Enter"){
+    hideAutocomplete();
+    await processCmd(realInput.value);
+  } else if(e.key==="Tab"){
+    e.preventDefault();doAutocomplete();
+  } else if(e.key==="ArrowUp"){
+    e.preventDefault();
+    if(histIdx>0){histIdx--;realInput.value=cmdHistory[histIdx];cmdDisplay.textContent=realInput.value;}
+  } else if(e.key==="ArrowDown"){
+    e.preventDefault();
+    if(histIdx<cmdHistory.length-1){histIdx++;realInput.value=cmdHistory[histIdx];cmdDisplay.textContent=realInput.value;}
+    else{histIdx=cmdHistory.length;realInput.value="";cmdDisplay.textContent="";}
+  } else if(e.key==="Escape"){hideAutocomplete();}
+  else if(e.key==="l"&&e.ctrlKey){e.preventDefault();output.innerHTML="";}
+});
+
+let acItems=[],acSelected=-1;
+function showAutocomplete(){
+  const val=realInput.value;const parts=val.split(" ");const last=parts[parts.length-1];
+  if(!last){hideAutocomplete();return;}
+  let candidates=[];
+  if(parts.length===1)candidates=Object.keys(cmds).filter(c=>c.startsWith(last));
+  else candidates=Object.keys(machine.currentDir.children).filter(f=>f.startsWith(last));
+  if(!candidates.length||candidates.length===1&&candidates[0]===last){hideAutocomplete();return;}
+  acItems=candidates;acSelected=-1;
+  const box=document.getElementById("autocomplete-box");
+  box.innerHTML=candidates.map((c,i)=>`<div class="ac-item" data-i="${i}" onclick="applyAC(${i})">${c}</div>`).join("");
+  box.style.display="block";
+}
+function hideAutocomplete(){document.getElementById("autocomplete-box").style.display="none";acItems=[];acSelected=-1;}
+function applyAC(i){
+  const parts=realInput.value.split(" ");parts[parts.length-1]=acItems[i];
+  realInput.value=parts.join(" ")+" ";cmdDisplay.textContent=realInput.value;hideAutocomplete();realInput.focus();
+}
+function doAutocomplete(){
+  if(acItems.length===1){applyAC(0);}
+  else if(acItems.length>1){acSelected=(acSelected+1)%acItems.length;document.querySelectorAll(".ac-item").forEach((el,i)=>el.classList.toggle("selected",i===acSelected));}
+  else{
+    const parts=realInput.value.split(" ");const last=parts[parts.length-1];
+    let cands=parts.length===1?Object.keys(cmds).filter(c=>c.startsWith(last)):Object.keys(machine.currentDir.children).filter(f=>f.startsWith(last));
+    if(cands.length===1){parts[parts.length-1]=cands[0];realInput.value=parts.join(" ")+" ";cmdDisplay.textContent=realInput.value;}
+    else if(cands.length>1){acItems=cands;acSelected=0;showAutocomplete();}
+  }
+}
+
+async function executeSingleCommand(input){
+  const parts=input.split(/\s+/);const name=parts[0].toLowerCase();const args=parts.slice(1);
+  let result="";
+  const alias={ll:"ls -la",la:"ls -a"};
+  if(alias[name])return executeSingleCommand(alias[name]+(args.length?" "+args.join(" "):""));
+  if(cmds[name]){
+    try{result=await cmds[name].exec(args,input);}
+    catch(err){result=`<span class="t-err">Erro interno: ${err.message}</span>`;}
+  } else {
+    result=`<span class="t-err">bash: ${name}: comando não encontrado</span>`;
+  }
+  return result;
+}
+
+async function processCmd(raw){
+  if(isProcessing)return;
+  const input=raw.trim();
+  if(!input){renderPrompt();return;}
+  cmdHistory.push(input);histIdx=cmdHistory.length;
+  isProcessing=true;realInput.disabled=true;
+  document.getElementById("cursor").style.animation="none";
+
+  const promptHtml=promptLabel.innerHTML;
+  printLine(`${promptHtml}<span style="color:var(--text)">${input.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</span>`);
+
+  const chain=input.split(/\s*&&\s*/).filter(Boolean);
+  let lastResult="";
+  for(const cmd of chain){
+    lastResult=await executeSingleCommand(cmd);
+    if(lastResult!==null&&lastResult!=="")printLine(lastResult);
+    if(typeof lastResult==="string"&&lastResult.includes('class="t-err"'))break;
+    renderPrompt();
+  }
+
+  renderPrompt();
+  if(missionIdx<missions.length&&missions[missionIdx].check(input,lastResult||"")){
+    await sleep(100);
+    printLine(`\n<span style="color:var(--green);font-weight:700">[✓] ${["Perfeito!","Ótimo!","Correto!","Excelente!"][Math.floor(Math.random()*4)]} — ${missions[missionIdx].cat}: missão concluída.</span>\n`,"");
+    missionIdx++;updateMission();
+  }
+  isProcessing=false;realInput.disabled=false;realInput.value="";cmdDisplay.textContent="";
+  realInput.focus();document.getElementById("cursor").style.animation="blink 1s step-end infinite";
+  output.scrollTop=output.scrollHeight;
+}
+
+// ───── DESKTOP SHELL HELPERS ─────
+function closeShellPanels(){
+  document.getElementById("app-menu")?.classList.remove("open");
+  document.getElementById("quick-panel")?.classList.remove("open");
+}
+function toggleAppMenu(){
+  const menu=document.getElementById("app-menu");
+  const quick=document.getElementById("quick-panel");
+  quick?.classList.remove("open");
+  menu?.classList.toggle("open");
+}
+function toggleQuickPanel(){
+  const quick=document.getElementById("quick-panel");
+  const menu=document.getElementById("app-menu");
+  menu?.classList.remove("open");
+  quick?.classList.toggle("open");
+}
+function openSettings(){openWindow("win-settings");}
+function applyTheme(name){
+  const themes={cyan:"#22d3ee",green:"#4ade80",amber:"#fbbf24",red:"#f87171",purple:"#a78bfa",blue:"#60a5fa"};
+  if(!themes[name])return;
+  document.documentElement.style.setProperty("--accent",themes[name]);
+  document.documentElement.style.setProperty("--accent-glow",themes[name]+"25");
+  notify("Tema aplicado",`Cor ativa: ${name}.`);
+}
+function setTermScale(size){
+  ["term-output","term-prompt-label","cmd-display"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.fontSize=size+"px";});
+  notify("Terminal ajustado",`Fonte alterada para ${size}px.`);
+}
+function showFilePreview(title,content){
+  document.getElementById("file-preview-title").textContent=title;
+  document.getElementById("file-preview-content").textContent=content||"(arquivo vazio)";
+  document.getElementById("file-preview").classList.add("open");
+}
+function closeFilePreview(){document.getElementById("file-preview").classList.remove("open");}
+function newTab(){
+  printLine(`<span class="t-info">[terminal]</span> Nova aba simulada criada. Use <span class="t-highlight">clear</span> para limpar a área atual.`);
+  notify("Terminal","Aba extra preparada no shell simulado.");
+}
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#app-menu")&&!e.target.closest(".activities"))document.getElementById("app-menu")?.classList.remove("open");
+  if(!e.target.closest("#quick-panel")&&!e.target.closest("#topbar-right"))document.getElementById("quick-panel")?.classList.remove("open");
+});
+
+// ───── DRAGGABLE WINDOWS ─────
+function makeWinDraggable(winId,barId){
+  const win=document.getElementById(winId),bar=document.getElementById(barId);
+  if(!win||!bar)return;
+  let dx=0,dy=0,sx=0,sy=0;
+  bar.addEventListener("mousedown",e=>{
+    if(e.button!==0)return;
+    e.preventDefault();
+    sx=e.clientX;sy=e.clientY;
+    document.querySelectorAll(".win").forEach(w=>w.style.zIndex="10");
+    win.style.zIndex="30";
+    function onMove(e){dx=sx-e.clientX;dy=sy-e.clientY;sx=e.clientX;sy=e.clientY;win.style.top=(win.offsetTop-dy)+"px";win.style.left=(win.offsetLeft-dx)+"px";win.style.right="auto";}
+    function onUp(){document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}
+    document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);
+  });
+  win.addEventListener("mousedown",()=>{document.querySelectorAll(".win").forEach(w=>w.style.zIndex="10");win.style.zIndex="30";});
+}
+["term","mission","sysmon","files","settings"].forEach(id=>makeWinDraggable(`win-${id}`,`win-${id}-bar`));
+
+// ───── WINDOW MANAGEMENT ─────
+function openWindow(id){
+  const w=document.getElementById(id);if(!w)return;
+  w.style.display="flex";
+  document.querySelectorAll(".win").forEach(x=>x.style.zIndex="10");
+  w.style.zIndex="30";
+  if(id==="win-term")realInput.focus();
+  if(id==="win-sysmon")startSysmon();
+}
+function closeWin(id){const w=document.getElementById(id);if(w)w.style.display="none";}
+function minimizeWin(id){closeWin(id);}
+let maxed={};
+function maximizeWin(id){
+  const w=document.getElementById(id);if(!w)return;
+  if(maxed[id]){Object.assign(w.style,maxed[id]);w.style.borderRadius="12px";delete maxed[id];}
+  else{maxed[id]={width:w.style.width,height:w.style.height,top:w.style.top,left:w.style.left,right:w.style.right};
+    Object.assign(w.style,{width:"100%",height:"calc(100vh - 28px)",top:"0",left:"0",right:"0",borderRadius:"0"});}
+}
+
+// ───── SYSMON ─────
+let sysDatas=Array(40).fill(0).map(()=>Math.floor(Math.random()*40+5));
+let sysmonInterval=null;
+function startSysmon(){
+  const body=document.getElementById("sysmon-body");
+  body.innerHTML=`
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)">Processos: <span style="color:var(--text2)" id="sm-procs">128</span> | Tasks: <span style="color:var(--text2)">4 running</span></div>
+    <div class="sysmon-bar-wrap"><div class="sysmon-label"><span>CPU <span id="sm-cpu">--</span>%</span><span style="color:var(--text3)">TermCPU 3.6GHz</span></div><div class="sysmon-bar"><div class="sysmon-fill" id="sm-cpu-bar" style="background:var(--accent)"></div></div></div>
+    <div class="sysmon-bar-wrap"><div class="sysmon-label"><span>RAM <span id="sm-ram">512</span>M / 4096M</span><span style="color:var(--text3)">12.5%</span></div><div class="sysmon-bar"><div class="sysmon-fill" id="sm-ram-bar" style="background:var(--purple);width:12.5%"></div></div></div>
+    <div class="sysmon-bar-wrap"><div class="sysmon-label"><span>SWAP</span><span style="color:var(--text3)">0K / 2048M</span></div><div class="sysmon-bar"><div class="sysmon-fill" style="background:var(--yellow);width:0%"></div></div></div>
+    <div class="sysmon-net"><div>↑ <span id="sm-up">0 KB/s</span></div><div>↓ <span id="sm-down">0 KB/s</span></div><div style="margin-left:auto">eth0: ${machine.ip}</div></div>
+    <canvas id="cpu-chart" width="296" height="70" style="border:1px solid var(--border);border-radius:4px;background:#0a0e18"></canvas>`;
+  if(sysmonInterval)clearInterval(sysmonInterval);
+  const canvas=document.getElementById("cpu-chart");
+  const ctx=canvas.getContext("2d");
+  function drawChart(){
+    ctx.clearRect(0,0,296,70);
+    ctx.fillStyle="#0a0e18";ctx.fillRect(0,0,296,70);
+    ctx.strokeStyle="rgba(34,211,238,0.1)";ctx.lineWidth=1;
+    for(let i=0;i<70;i+=14){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(296,i);ctx.stroke();}
+    ctx.strokeStyle="var(--accent)";ctx.lineWidth=1.5;ctx.beginPath();
+    sysDatas.forEach((v,i)=>{const x=(i/40)*296;const y=70-(v/100)*70;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+    const grd=ctx.createLinearGradient(0,0,0,70);
+    grd.addColorStop(0,"rgba(34,211,238,0.2)");grd.addColorStop(1,"rgba(34,211,238,0)");
+    ctx.fillStyle=grd;ctx.lineTo(296,70);ctx.lineTo(0,70);ctx.closePath();ctx.fill();
+  }
+  sysmonInterval=setInterval(()=>{
+    const cpu=Math.floor(Math.random()*35+5);
+    sysDatas.push(cpu);sysDatas.shift();
+    document.getElementById("sm-cpu").textContent=cpu;
+    document.getElementById("sm-cpu-bar").style.width=cpu+"%";
+    document.getElementById("sm-up").textContent=Math.floor(Math.random()*100)+" KB/s";
+    document.getElementById("sm-down").textContent=Math.floor(Math.random()*300)+" KB/s";
+    drawChart();
+  },800);
+  drawChart();
+}
+
+// ───── FILE MANAGER ─────
+let fmNode=getHomeDir(machine);
+function fmNavigate(key){
+  if(key==="home")fmNode=getHomeDir(machine);
+  if(key==="root")fmNode=machine.root;
+  renderFM();
+}
+function fmBack(){if(fmNode.parent)fmNode=fmNode.parent;renderFM();}
+function renderFM(){
+  document.getElementById("fm-path-bar").value=getFullPath(fmNode);
+  const grid=document.getElementById("fm-grid");
+  grid.innerHTML="";
+  Object.values(fmNode.children).forEach(n=>{
+    const icon=n.type==="dir"?"📁":n.name.endsWith(".sh")?"📜":n.name.endsWith(".txt")||n.name.endsWith(".md")?"📄":n.name.endsWith(".db")||n.name.endsWith(".json")?"🗄️":"📄";
+    const el=document.createElement("div");
+    el.className="fm-file-item";
+    el.innerHTML=`<span class="fi-icon">${icon}</span><span class="fi-name">${n.name}${n.type==="dir"?"":""}</span>`;
+    el.ondblclick=()=>{if(n.type==="dir"){fmNode=n;renderFM();}else showFilePreview(n.name,n.content||"(arquivo vazio)");};
+    grid.appendChild(el);
+  });
+}
+
+// ───── MANUAL PAGE ─────
+function showManPage(p){
+  const m=document.getElementById("man-modal");
+  document.getElementById("man-title").textContent=p.name;
+  document.getElementById("man-content").innerHTML=`
+    <div class="man-section">SYNOPSIS</div><div>${p.synopsis}</div>
+    <div class="man-section">DESCRIPTION</div><div>${p.desc}</div>
+    <div class="man-section">OPTIONS</div><div>${p.opts.map(o=>`<div style="margin:4px 0 4px 16px"><span style="color:var(--accent)">${o}</span></div>`).join("")}</div>`;
+  m.classList.add("open");
+}
+
+// ───── LESSON MODAL ─────
+function showLesson(){document.getElementById("lesson-modal").classList.add("open");}
+function closeLesson(){document.getElementById("lesson-modal").classList.remove("open");}
+
+// ───── CLOCK ─────
+function tick(){
+  const n=new Date();
+  const days=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  document.getElementById("topbar-center").textContent=`${days[n.getDay()]} ${n.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
+  document.getElementById("top-clock-el").textContent=n.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+setInterval(tick,1000);tick();
+
+// ───── BOOT SEQUENCE ─────
+async function boot(){
+  const lines=document.getElementById("boot-lines");
+  const add=(html,cls="")=>{const d=document.createElement("div");d.className=cls;d.innerHTML=html;lines.appendChild(d);};
+  const bootMsgs=[
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started Show Plymouth Boot Screen.",d:80},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Reached target Paths.",d:60},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Reached target Basic System.",d:100},
+    {t:"         Mounting FUSE Control File System...",d:120},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Mounted FUSE Control File System.",d:80},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started Network Time Synchronization.",d:150},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started Network Manager.",d:90},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Reached target Network.",d:100},
+    {t:"         Starting WPA Supplicant daemon...",d:80},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started WPA Supplicant.",d:120},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started Login Service.",d:80},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Started TermHacker Desktop Environment.",d:200},
+    {t:"[  <span class='boot-ok'>OK</span>  ] Reached target Graphical Interface.",d:100},
+    {t:"<span class='boot-info'>[INFO] TermHacker OS v6.0 — Educational Linux Environment</span>",d:200},
+  ];
+  for(const m of bootMsgs){add(m.t);await sleep(m.d);}
+  await sleep(400);
+  document.getElementById("boot").style.opacity="0";
+  document.getElementById("boot").style.transition="opacity .6s";
+  await sleep(600);
+  document.getElementById("boot").style.display="none";
+  document.getElementById("os").style.display="flex";
+  renderPrompt();updateMission();renderFM();updateSandboxUI();
+  await sleep(200);
+  printLine(`<span style="color:var(--text3);font-size:11px">TermHacker OS 6.0 — ambiente Linux educativo</span>`);
+  printLine(`<span style="color:var(--text3);font-size:11px">Digite <span style="color:var(--accent)">help</span> para comandos, <span style="color:var(--accent)">sandbox on</span> para isolamento, <span style="color:var(--accent)">tree</span> para explorar e <span style="color:var(--accent)">TAB</span> para autocompletar.</span>`);
+  printBlank();
+  realInput.focus();
+}
+window.addEventListener("load",boot);
+</script>
+</body>
+</html>
