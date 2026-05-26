@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TermHacker OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -30,7 +31,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 #topbar .activities:hover{background:rgba(255,255,255,.1)}
 #topbar-center{position:absolute;left:50%;transform:translateX(-50%);font-weight:500;font-size:12px;color:var(--text)}
 #topbar-right{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:11px}
-.top-icon{display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 5px;border-radius:3px;transition:.15s}
+.top-icon{display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 5px;border-radius:3px;transition:.15s}
+.top-icon i,.mi i,.dock-app i,.dicon i,.fm-icon i{font-size:14px;line-height:1}
+.dock-app i{font-size:18px}
+.mi i{font-size:16px}
+.ic{width:14px;height:14px;display:inline-block;vertical-align:middle}
+.ic-lg{width:18px;height:18px}
 .top-icon:hover{background:rgba(255,255,255,.1)}
 
 /* DESKTOP */
@@ -171,8 +177,25 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 .dock-app:hover{transform:translateX(4px) scale(1.08)}
 .dock-app .tooltip{left:calc(100% + 10px);bottom:auto;top:50%;transform:translateY(-50%)}
 .desktop-icon{position:absolute;width:86px;padding:10px 8px;border-radius:10px;text-align:center;cursor:pointer;color:var(--text2);transition:.15s;font-size:11px;user-select:none}
-.desktop-icon:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.desktop-icon:hover{background:rgba(255,255,255,.12);color:var(--text);backdrop-filter:blur(12px)}
 .desktop-icon .dicon{display:block;font-size:30px;margin-bottom:6px}
+.desktop-icon,.dock-app{background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 10px 30px rgba(0,0,0,.3)}
+.win{backdrop-filter:blur(22px);background:linear-gradient(160deg,rgba(20,26,38,.86),rgba(15,20,31,.74))}
+.fm-toolbar .ui-btn-mini{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--text2);padding:4px 9px;border-radius:7px;cursor:pointer;font-size:11px}
+.fm-toolbar .ui-btn-mini:hover{border-color:var(--accent);color:var(--text);background:rgba(34,211,238,.1)}
+.code-wrap{display:flex;height:100%;background:#0b1020}
+.code-sidebar{width:190px;border-right:1px solid var(--border);background:#0f1528;padding:8px;overflow:auto}
+.code-sidebar h4{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.code-file{padding:6px 8px;border-radius:7px;color:var(--text2);cursor:pointer;font-size:11px}
+.code-file:hover,.code-file.active{background:rgba(34,211,238,.14);color:var(--text)}
+.code-main{flex:1;display:flex;flex-direction:column}
+.code-top{height:36px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 10px;background:#0f1528}
+.code-tabs{display:flex;gap:6px;align-items:center;max-width:55%;overflow:auto}
+.code-tab{font-size:11px;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.06);cursor:pointer;color:var(--text2);white-space:nowrap}
+.code-tab.active{background:rgba(34,211,238,.2);color:var(--text)}
+.code-editor{flex:1;width:100%;border:none;outline:none;resize:none;background:#0b1020;color:#dce6f7;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.65;padding:14px}
+.code-console{height:120px;border-top:1px solid var(--border);background:#090d18;color:#b8c5d9;font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px;overflow:auto;white-space:pre-wrap}
+.code-status{height:24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#0f1528;font-size:11px;color:var(--text2)}
 #app-menu,#quick-panel{position:absolute;top:34px;background:rgba(11,16,25,.96);backdrop-filter:blur(18px);border:1px solid var(--border2);border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.55);z-index:120;display:none;overflow:hidden}
 #app-menu.open,#quick-panel.open{display:block}
 #app-menu{left:10px;width:270px;padding:8px}
@@ -191,12 +214,26 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 .toast{width:320px;background:rgba(11,16,25,.96);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:12px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:toastIn .25s ease}
 .toast-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
 .toast-body{font-size:11px;line-height:1.5;color:var(--text2)}
+.notif-center{position:absolute;right:14px;top:36px;width:320px;max-height:50vh;overflow:auto;background:rgba(11,16,25,.96);border:1px solid var(--border2);border-radius:12px;padding:10px;z-index:170;display:none}
+.notif-center.open{display:block}
+.notif-item{padding:8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px}
+.ctx-menu{position:fixed;z-index:500;display:none;min-width:180px;background:rgba(12,18,30,.98);border:1px solid var(--border2);border-radius:10px;padding:6px}
+.ctx-menu.open{display:block}
+.ctx-item{padding:8px 10px;border-radius:8px;color:var(--text2);cursor:pointer;font-size:12px;display:flex;gap:8px;align-items:center}
+.ctx-item:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.browser-wrap{display:flex;flex-direction:column;height:100%;background:#0a1020}
+.browser-bar{display:flex;gap:8px;padding:8px;border-bottom:1px solid var(--border)}
+.browser-page{flex:1;padding:16px;overflow:auto}
+.profile-card{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 #win-settings{width:520px;height:390px;top:78px;left:calc(50% - 260px);display:none}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;background:var(--bg2);height:100%;overflow:auto}
 .settings-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px}
 .settings-card h3{font-size:12px;color:var(--text);margin-bottom:10px}
 .settings-card p{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:10px}
+.theme-shop{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.theme-pack{padding:8px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;background:var(--bg4);font-size:11px}
+.theme-pack:hover{border-color:var(--accent)}
 .ui-btn{border:1px solid var(--border2);background:var(--bg4);color:var(--text);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:11px;transition:.15s;margin:3px 4px 3px 0}
 .ui-btn:hover{border-color:var(--accent);background:rgba(34,211,238,.08)}
 .status-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -222,7 +259,7 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
      ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
      ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
      ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-                                    OS v6.0 — Educational Linux Environment</pre>
+                                    OS v6.0 - Educational Linux Environment</pre>
   <div id="boot-lines"></div>
 </div>
 
@@ -232,36 +269,33 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 <!-- TOPBAR -->
 <div id="topbar">
   <div style="display:flex;align-items:center;gap:2px">
-    <div class="activities" onclick="toggleAppMenu()">Aplicações ▾</div>
+    <div class="activities" onclick="toggleAppMenu()">Aplicacoes ?</div>
     <div style="width:1px;height:14px;background:var(--border2);margin:0 4px"></div>
     <span style="color:var(--text3);cursor:pointer" onclick="openWindow('win-files')">Arquivos</span>
   </div>
-  <div id="topbar-center">—</div>
+  <div id="topbar-center">-</div>
   <div id="topbar-right">
-    <div class="top-icon" title="Rede">
-      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z" opacity=".4"/></svg>
-      <span id="net-indicator">LOCAL</span>
-    </div>
-    <div class="top-icon" onclick="toggleSandbox()" title="Alternar modo sandbox">🧪 <span id="sandbox-top">OFF</span></div>
-    <div class="top-icon">🔋 100%</div>
-    <div class="top-icon" id="top-clock-el">Seg 00:00</div>
-    <div class="top-icon" onclick="toggleQuickPanel()" style="background:rgba(255,255,255,.08);border-radius:50%;width:22px;height:22px;justify-content:center" title="Configurações rápidas">👤</div>
+    <div class="top-icon" title="Rede"><i class="bi bi-wifi"></i><span id="net-indicator">LOCAL</span></div>
+    <div class="top-icon" onclick="toggleSandbox()" title="Alternar sandbox"><i class="bi bi-beaker"></i> <span id="sandbox-top">OFF</span></div>
+    <div class="top-icon"><i class="bi bi-battery-full"></i> 100%</div>
+    <div class="top-icon" id="top-clock-el">00:00</div>
+    <div class="top-icon" onclick="toggleQuickPanel()" style="background:rgba(255,255,255,.08);border-radius:50%;width:22px;height:22px;justify-content:center" title="Painel rapido"><i class="bi bi-person-circle"></i></div>
   </div>
 </div>
 
 <div id="app-menu">
-  <div class="menu-title">Aplicações</div>
-  <div class="menu-item" onclick="openWindow('win-term');closeShellPanels()"><span class="mi">🖥️</span><div><div>Terminal</div><small>Shell Linux educativo</small></div></div>
-  <div class="menu-item" onclick="openWindow('win-files');closeShellPanels()"><span class="mi">📁</span><div><div>Arquivos</div><small>Navegue no sistema virtual</small></div></div>
-  <div class="menu-item" onclick="openWindow('win-sysmon');closeShellPanels()"><span class="mi">📊</span><div><div>Monitor do Sistema</div><small>CPU, RAM e tráfego</small></div></div>
-  <div class="menu-item" onclick="openSettings();closeShellPanels()"><span class="mi">⚙️</span><div><div>Configurações</div><small>Tema, sandbox e interface</small></div></div>
-  <div class="menu-title">Ambiente</div>
-  <div class="menu-item" onclick="toggleSandbox();closeShellPanels()"><span class="mi">🧪</span><div><div>Alternar Sandbox</div><small>Teste sem afetar a sessão principal</small></div></div>
+  <div class="menu-title">Aplicacoes</div>
+  <div class="menu-item" onclick="openWindow('win-term');closeShellPanels()"><span class="mi"><i class="bi bi-terminal"></i></span><div><div>Terminal</div><small>Shell Linux educativo</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-files');closeShellPanels()"><span class="mi"><i class="bi bi-folder2-open"></i></span><div><div>Arquivos</div><small>Navegue no sistema virtual</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-code');closeShellPanels()"><span class="mi"><i class="bi bi-braces"></i></span><div><div>Mini Code</div><small>Editor</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-browser');closeShellPanels()"><span class="mi"><i class="bi bi-globe2"></i></span><div><div>Navegador</div><small>Intranet e Docs</small></div></div>
+  <div class="menu-item" onclick="openWindow('win-sysmon');closeShellPanels()"><span class="mi"><i class="bi bi-graph-up"></i></span><div><div>Monitor</div><small>CPU, RAM e trafego</small></div></div>
+  <div class="menu-item" onclick="openSettings();closeShellPanels()"><span class="mi"><i class="bi bi-gear"></i></span><div><div>Configuracoes</div><small>Tema e sistema</small></div></div>
 </div>
 <div id="quick-panel">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <strong style="font-size:13px">Painel rápido</strong>
-    <span class="shell-chip" id="sandbox-chip">🧪 Sandbox OFF</span>
+    <strong style="font-size:13px">Painel rapido</strong>
+    <span class="shell-chip" id="sandbox-chip"><i class="bi bi-beaker"></i> Sandbox OFF</span>
   </div>
   <div class="quick-grid">
     <div class="quick-tile" onclick="toggleSandbox()"><strong>Sandbox</strong><span id="quick-sandbox-label">Desativado</span></div>
@@ -273,12 +307,10 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 
 <!-- DESKTOP -->
 <div id="desktop">
-  <div id="sandbox-banner">🧪 MODO SANDBOX — alterações descartáveis</div>
-  <div class="desktop-icon" style="top:24px;left:92px" ondblclick="openWindow('win-files')"><span class="dicon">🏠</span>Home</div>
-  <div class="desktop-icon" style="top:122px;left:92px" ondblclick="showLesson()"><span class="dicon">📘</span>Manual</div>
-  <div class="desktop-icon" style="top:220px;left:92px" ondblclick="toggleSandbox()"><span class="dicon">🧪</span>Sandbox</div>
-
-  <!-- TERMINAL WINDOW -->
+  <div id="sandbox-banner"><i class="bi bi-beaker"></i> MODO SANDBOX - alteracoes descartaveis</div>
+  <div class="desktop-icon" style="top:24px;left:92px" ondblclick="openWindow('win-files')"><span class="dicon"><i class="bi bi-house-door"></i></span>Home</div>
+  <div class="desktop-icon" style="top:122px;left:92px" ondblclick="showLesson()"><span class="dicon"><i class="bi bi-journal-text"></i></span>Manual</div>
+  <div class="desktop-icon" style="top:220px;left:92px" ondblclick="toggleSandbox()"><span class="dicon"><i class="bi bi-beaker"></i></span>Sandbox</div><!-- TERMINAL WINDOW -->
   <div class="win" id="win-term" style="width:700px;height:490px;top:50px;left:50px;z-index:20">
     <div class="win-titlebar" id="win-term-bar">
       <div class="win-btn btn-close" onclick="closeWin('win-term')"></div>
@@ -309,7 +341,7 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
       <div class="win-btn btn-close" onclick="closeWin('win-mission')"></div>
       <div class="win-btn btn-min"></div>
       <div class="win-btn btn-max"></div>
-      <div class="win-title">📋 Missões</div>
+      <div class="win-title"><i class="bi bi-list-check"></i> Missões</div>
     </div>
     <div class="win-body" style="padding:14px;background:var(--bg2);display:flex;flex-direction:column;gap:12px">
       <div class="mission-header">
@@ -326,8 +358,8 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
         <div class="mission-hint" id="m-hint" style="display:none"><span>$</span> <span id="m-hint-cmd"></span></div>
       </div>
       <div style="display:flex;gap:6px">
-        <button onclick="showLesson()" style="flex:1;padding:7px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);color:var(--accent);border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:.15s">📖 Referência</button>
-        <button onclick="revealHint()" style="flex:1;padding:7px;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.2);color:var(--purple);border-radius:6px;cursor:pointer;font-size:11px;transition:.15s">💡 Dica</button>
+        <button onclick="showLesson()" style="flex:1;padding:7px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);color:var(--accent);border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:.15s"><i class="bi bi-journal-text"></i> Referência</button>
+        <button onclick="revealHint()" style="flex:1;padding:7px;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.2);color:var(--purple);border-radius:6px;cursor:pointer;font-size:11px;transition:.15s"><i class="bi bi-lightbulb"></i> Dica</button>
       </div>
     </div>
   </div>
@@ -338,7 +370,7 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
       <div class="win-btn btn-close" onclick="closeWin('win-sysmon')"></div>
       <div class="win-btn btn-min"></div>
       <div class="win-btn btn-max"></div>
-      <div class="win-title">📊 Monitor do Sistema</div>
+      <div class="win-title"><i class="bi bi-graph-up"></i> Monitor do Sistema</div>
     </div>
     <div id="sysmon-body" class="win-body" style="padding:12px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;overflow:visible"></div>
   </div>
@@ -349,24 +381,66 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
       <div class="win-btn btn-close" onclick="closeWin('win-files')"></div>
       <div class="win-btn btn-min"></div>
       <div class="win-btn btn-max"></div>
-      <div class="win-title">📁 Gerenciador de Arquivos — Nautilus</div>
+      <div class="win-title"><i class="bi bi-folder2-open"></i> Gerenciador de Arquivos - Nautilus</div>
     </div>
     <div class="win-body" style="display:flex;overflow:hidden;background:var(--bg2)">
       <div class="fm-sidebar">
         <div class="fm-section">Favoritos</div>
-        <div class="fm-item active" onclick="fmNavigate('home')"><span class="fm-icon">🏠</span>Pasta Pessoal</div>
-        <div class="fm-item" onclick="fmNavigate('root')"><span class="fm-icon">💾</span>Raiz /</div>
+        <div class="fm-item active" onclick="fmNavigate('home')"><span class="fm-icon"><i class="bi bi-house-door"></i></span>Pasta Pessoal</div>
+        <div class="fm-item" onclick="fmNavigate('root')"><span class="fm-icon"><i class="bi bi-hdd"></i></span>Raiz /</div>
         <div class="fm-section">Dispositivos</div>
-        <div class="fm-item"><span class="fm-icon">💿</span>sda1 (28G)</div>
-        <div class="fm-item"><span class="fm-icon">🔌</span>tmpfs</div>
+        <div class="fm-item"><span class="fm-icon"><i class="bi bi-device-hdd"></i></span>sda1 (28G)</div>
+        <div class="fm-item"><span class="fm-icon"><i class="bi bi-usb-plug"></i></span>tmpfs</div>
       </div>
       <div class="fm-main">
         <div class="fm-toolbar">
-          <button style="background:none;border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px" onclick="fmBack()">‹</button>
+          <button class="ui-btn-mini" onclick="fmBack()">‹</button>
+          <button class="ui-btn-mini" onclick="fmCreateFolder()">+ Pasta</button>
+          <button class="ui-btn-mini" onclick="fmCreateFile()">+ Arquivo</button>
           <input class="fm-path" id="fm-path-bar" value="/home/root" readonly>
         </div>
         <div class="fm-grid" id="fm-grid"></div>
       </div>
+    </div>
+  </div>
+  <div class="win" id="win-code" style="width:760px;height:470px;top:90px;left:120px;display:none;z-index:16">
+    <div class="win-titlebar" id="win-code-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-code')"></div>
+      <div class="win-btn btn-min"></div>
+      <div class="win-btn btn-max" onclick="maximizeWin('win-code')"></div>
+      <div class="win-title"><i class="bi bi-braces"></i> Mini VS Code</div>
+    </div>
+    <div class="win-body code-wrap">
+      <div class="code-sidebar">
+        <h4>Explorer</h4>
+        <div id="code-explorer"></div>
+      </div>
+      <div class="code-main">
+        <div class="code-top">
+          <div class="code-tabs" id="code-tabs"></div>
+          <span class="shell-chip" id="code-current-file">nenhum arquivo</span>
+          <button class="ui-btn-mini" onclick="codeSaveFile()">Salvar</button>
+          <button class="ui-btn-mini" onclick="codeRunFile()">Run</button>
+          <button class="ui-btn-mini" onclick="codeNewFile()">Novo Arquivo</button>
+        </div>
+        <textarea id="code-editor" class="code-editor" spellcheck="false" placeholder="// Abra um arquivo no Explorer"></textarea>
+        <div id="code-console" class="code-console">$ pronto para executar scripts</div>
+        <div class="code-status"><span id="code-language">Plain Text</span><span id="code-pos">Ln 1, Col 1</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="win" id="win-browser" style="width:720px;height:430px;top:100px;left:160px;display:none;z-index:16">
+    <div class="win-titlebar" id="win-browser-bar">
+      <div class="win-btn btn-close" onclick="closeWin('win-browser')"></div><div class="win-btn btn-min"></div><div class="win-btn btn-max"></div>
+      <div class="win-title"><i class="bi bi-globe2"></i> Browser</div>
+    </div>
+    <div class="win-body browser-wrap">
+      <div class="browser-bar">
+        <button class="ui-btn-mini" onclick="openBrowserPage('docs')">Docs</button>
+        <button class="ui-btn-mini" onclick="openBrowserPage('intranet')">Intranet</button>
+        <button class="ui-btn-mini" onclick="openBrowserPage('ctf')">CTF</button>
+      </div>
+      <div id="browser-page" class="browser-page"></div>
     </div>
   </div>
 
@@ -376,70 +450,75 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
       <div class="win-btn btn-close" onclick="closeWin('win-settings')"></div>
       <div class="win-btn btn-min" onclick="minimizeWin('win-settings')"></div>
       <div class="win-btn btn-max" onclick="maximizeWin('win-settings')"></div>
-      <div class="win-title">⚙️ Configurações do Ambiente</div>
+      <div class="win-title"><i class="bi bi-gear"></i> Configuracoes do Ambiente</div>
     </div>
     <div class="win-body">
       <div class="settings-grid">
-        <div class="settings-card"><h3>🎨 Aparência</h3><p>Troque rapidamente a cor principal do sistema.</p><button class="ui-btn" onclick="applyTheme('cyan')">Ciano</button><button class="ui-btn" onclick="applyTheme('green')">Verde</button><button class="ui-btn" onclick="applyTheme('amber')">Âmbar</button><button class="ui-btn" onclick="applyTheme('purple')">Roxo</button></div>
-        <div class="settings-card"><h3>🧪 Sandbox</h3><p>Cria uma cópia isolada da sessão local. Arquivos criados e removidos ali são descartados ao sair.</p><button class="ui-btn" onclick="toggleSandbox()">Ativar / Desativar</button><button class="ui-btn" onclick="resetSandbox()">Resetar</button></div>
+        <div class="settings-card"><h3><i class="bi bi-palette"></i> Aparencia</h3><p>Troque rapidamente a cor principal do sistema.</p><button class="ui-btn" onclick="applyTheme('cyan')">Ciano</button><button class="ui-btn" onclick="applyTheme('green')">Verde</button><button class="ui-btn" onclick="applyTheme('amber')">Âmbar</button><button class="ui-btn" onclick="applyTheme('purple')">Roxo</button></div>
+        <div class="settings-card"><h3><i class="bi bi-bag"></i> Loja de Temas</h3><p>Pacotes completos com cor + wallpaper.</p><div class="theme-shop"><div class="theme-pack" onclick="applyThemePack('aurora')">Aurora</div><div class="theme-pack" onclick="applyThemePack('sunset')">Sunset</div><div class="theme-pack" onclick="applyThemePack('matrix')">Matrix</div><div class="theme-pack" onclick="applyThemePack('ocean')">Ocean</div></div></div>
+        <div class="settings-card"><h3><i class="bi bi-hdd"></i> Snapshots</h3><p>Salve e restaure o estado da sessao virtual.</p><button class="ui-btn" onclick="saveSnapshot()">Salvar Snapshot</button><button class="ui-btn" onclick="restoreSnapshot()">Restaurar Snapshot</button></div>
+        <div class="settings-card"><h3><i class="bi bi-bullseye"></i> Trilhas</h3><p>Escolha uma trilha de missao.</p><button class="ui-btn" onclick="setMissionTrack('linux')">Linux</button><button class="ui-btn" onclick="setMissionTrack('rede')">Rede</button><button class="ui-btn" onclick="setMissionTrack('dev')">Dev</button></div>
+        <div class="settings-card"><h3><i class="bi bi-beaker"></i> Sandbox</h3><p>Cria uma cópia isolada da sessao local. Arquivos criados e removidos ali são descartados ao sair.</p><button class="ui-btn" onclick="toggleSandbox()">Ativar / Desativar</button><button class="ui-btn" onclick="resetSandbox()">Resetar</button></div>
         <div class="settings-card"><h3>⌨️ Terminal</h3><p>Atalhos úteis: Ctrl+L limpa, TAB completa, ↑ e ↓ navegam no histórico.</p><button class="ui-btn" onclick="setTermScale(12)">Fonte P</button><button class="ui-btn" onclick="setTermScale(13)">Fonte M</button><button class="ui-btn" onclick="setTermScale(15)">Fonte G</button></div>
-        <div class="settings-card"><h3>📌 Estado</h3><div class="status-row"><span class="shell-chip" id="settings-host">host: local</span><span class="shell-chip" id="settings-path">cwd: ~</span></div><p style="margin-top:10px">Comandos novos: <b>sandbox</b>, <b>tree</b>, <b>stat</b>, <b>ll</b>.</p></div>
+        <div class="settings-card"><h3><i class="bi bi-pin-angle"></i> Estado</h3><div class="status-row"><span class="shell-chip" id="settings-host">host: local</span><span class="shell-chip" id="settings-path">cwd: ~</span></div><p style="margin-top:10px">Comandos novos: <b>sandbox</b>, <b>tree</b>, <b>stat</b>, <b>ll</b>.</p></div>
       </div>
     </div>
   </div>
 
   <!-- DOCK -->
   <div id="dock">
-    <div class="dock-app" onclick="openWindow('win-term')" title="Terminal">
-      <span>🖥️</span><div class="tooltip">Terminal</div><div class="dock-indicator"></div>
-    </div>
-    <div class="dock-app" onclick="openWindow('win-files')"><span>📁</span><div class="tooltip">Arquivos</div></div>
-    <div class="dock-app" onclick="openWindow('win-sysmon')"><span>📊</span><div class="tooltip">Monitor</div></div>
-    <div class="dock-sep"></div>
-    <div class="dock-app" onclick="showLesson()"><span>📖</span><div class="tooltip">Manual Linux</div></div>
-    <div class="dock-app" onclick="openSettings()"><span>⚙️</span><div class="tooltip">Configurações</div></div>
-  </div>
+  <div class="dock-app" onclick="openWindow('win-term')" title="Terminal"><span><i class="bi bi-terminal"></i></span><div class="tooltip">Terminal</div><div class="dock-indicator"></div></div>
+  <div class="dock-app" onclick="openWindow('win-files')"><span><i class="bi bi-folder2-open"></i></span><div class="tooltip">Arquivos</div></div>
+  <div class="dock-app" onclick="openWindow('win-code')"><span><i class="bi bi-braces"></i></span><div class="tooltip">Mini Code</div></div>
+  <div class="dock-app" onclick="openWindow('win-browser')"><span><i class="bi bi-globe2"></i></span><div class="tooltip">Navegador</div></div>
+  <div class="dock-app" onclick="openWindow('win-sysmon')"><span><i class="bi bi-graph-up"></i></span><div class="tooltip">Monitor</div></div>
+  <div class="dock-sep"></div>
+  <div class="dock-app" onclick="showLesson()"><span><i class="bi bi-journal-text"></i></span><div class="tooltip">Manual</div></div>
+  <div class="dock-app" onclick="openSettings()"><span><i class="bi bi-gear"></i></span><div class="tooltip">Configuracoes</div></div>
+</div>
 
 </div><!-- /desktop -->
 </div><!-- /os -->
 <div id="notifications"></div>
-<div id="file-preview" class="file-preview" onclick="if(event.target===this)closeFilePreview()"><div class="file-preview-box"><div class="file-preview-head"><strong id="file-preview-title">Arquivo</strong><button class="man-close" onclick="closeFilePreview()">✕ fechar</button></div><div id="file-preview-content"></div></div></div>
+<div id="notif-center" class="notif-center"></div>
+<div id="ctx-menu" class="ctx-menu"></div>
+<div id="file-preview" class="file-preview" onclick="if(event.target===this)closeFilePreview()"><div class="file-preview-box"><div class="file-preview-head"><strong id="file-preview-title">Arquivo</strong><button class="man-close" onclick="closeFilePreview()">x fechar</button></div><div id="file-preview-content"></div></div></div>
 
 <!-- LESSON MODAL -->
 <div id="lesson-modal">
   <div class="lesson-box">
-    <h2>📖 Referência de Comandos Linux</h2>
-    <div class="lesson-sub">Guia rápido para navegar e operar o terminal</div>
+    <h2><i class="bi bi-journal-text"></i> Referência de Comandos Linux</h2>
+    <div class="lesson-sub">Guia rapido para navegar e operar o terminal</div>
     <div class="lesson-section">
-      <h3>Navegação</h3>
-      <div class="lesson-row"><span class="lesson-cmd">pwd</span><div class="lesson-desc">Mostra o caminho do diretório atual<div class="lesson-example"># Exemplo: /home/root/documentos</div></div></div>
-      <div class="lesson-row"><span class="lesson-cmd">ls</span><div class="lesson-desc">Lista arquivos e pastas do diretório atual<div class="lesson-example">ls -la  # lista detalhada com arquivos ocultos</div></div></div>
-      <div class="lesson-row"><span class="lesson-cmd">cd [dir]</span><div class="lesson-desc">Muda para o diretório especificado<div class="lesson-example">cd ..  (pai) | cd ~  (home) | cd /  (raiz)</div></div></div>
+      <h3>Navegacao</h3>
+      <div class="lesson-row"><span class="lesson-cmd">pwd</span><div class="lesson-desc">Mostra o caminho do diretorio atual<div class="lesson-example"># Exemplo: /home/root/documentos</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">ls</span><div class="lesson-desc">Lista arquivos e pastas do diretorio atual<div class="lesson-example">ls -la  # lista detalhada com arquivos ocultos</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">cd [dir]</span><div class="lesson-desc">Muda para o diretorio especificado<div class="lesson-example">cd ..  (pai) | cd ~  (home) | cd /  (raiz)</div></div></div>
     </div>
     <div class="lesson-section">
       <h3>Arquivos</h3>
-      <div class="lesson-row"><span class="lesson-cmd">cat [arq]</span><div class="lesson-desc">Exibe o conteúdo de um arquivo</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">cat [arq]</span><div class="lesson-desc">Exibe o conteudo de um arquivo</div></div>
       <div class="lesson-row"><span class="lesson-cmd">touch [arq]</span><div class="lesson-desc">Cria arquivo vazio ou atualiza timestamp</div></div>
-      <div class="lesson-row"><span class="lesson-cmd">mkdir [dir]</span><div class="lesson-desc">Cria um novo diretório<div class="lesson-example">mkdir -p a/b/c  # cria estrutura aninhada</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">mkdir [dir]</span><div class="lesson-desc">Cria um novo diretorio<div class="lesson-example">mkdir -p a/b/c  # cria estrutura aninhada</div></div></div>
       <div class="lesson-row"><span class="lesson-cmd">rm [arq]</span><div class="lesson-desc">Remove arquivo<div class="lesson-example">rm -r pasta/  # remove pasta recursivamente</div></div></div>
-      <div class="lesson-row"><span class="lesson-cmd">cp src dst</span><div class="lesson-desc">Copia arquivo ou diretório</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">cp src dst</span><div class="lesson-desc">Copia arquivo ou diretorio</div></div>
       <div class="lesson-row"><span class="lesson-cmd">mv src dst</span><div class="lesson-desc">Move ou renomeia arquivo</div></div>
     </div>
     <div class="lesson-section">
       <h3>Texto & Busca</h3>
-      <div class="lesson-row"><span class="lesson-cmd">echo "txt"</span><div class="lesson-desc">Imprime texto — use &gt; para salvar em arquivo<div class="lesson-example">echo "olá" > arquivo.txt</div></div></div>
+      <div class="lesson-row"><span class="lesson-cmd">echo "txt"</span><div class="lesson-desc">Imprime texto - use &gt; para salvar em arquivo<div class="lesson-example">echo "olá" > arquivo.txt</div></div></div>
       <div class="lesson-row"><span class="lesson-cmd">grep txt arq</span><div class="lesson-desc">Busca padrão em arquivos<div class="lesson-example">grep -r "senha" /etc/  # busca recursiva</div></div></div>
       <div class="lesson-row"><span class="lesson-cmd">find / -name</span><div class="lesson-desc">Encontra arquivos pelo nome</div></div>
       <div class="lesson-row"><span class="lesson-cmd">wc -l arq</span><div class="lesson-desc">Conta linhas de um arquivo</div></div>
     </div>
     <div class="lesson-section">
       <h3>Sistema</h3>
-      <div class="lesson-row"><span class="lesson-cmd">whoami</span><div class="lesson-desc">Mostra o usuário logado</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">whoami</span><div class="lesson-desc">Mostra o usuario logado</div></div>
       <div class="lesson-row"><span class="lesson-cmd">uname -a</span><div class="lesson-desc">Informações do kernel e sistema</div></div>
       <div class="lesson-row"><span class="lesson-cmd">ps aux</span><div class="lesson-desc">Lista processos em execução</div></div>
       <div class="lesson-row"><span class="lesson-cmd">top</span><div class="lesson-desc">Monitor de processos em tempo real</div></div>
       <div class="lesson-row"><span class="lesson-cmd">df -h</span><div class="lesson-desc">Uso de espaço em disco</div></div>
-      <div class="lesson-row"><span class="lesson-cmd">chmod +x</span><div class="lesson-desc">Adiciona permissão de execução a um arquivo</div></div>
+      <div class="lesson-row"><span class="lesson-cmd">chmod +x</span><div class="lesson-desc">Adiciona permissao de execução a um arquivo</div></div>
     </div>
     <div class="lesson-section">
       <h3>Rede (modo simulado)</h3>
@@ -455,7 +534,7 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 <!-- MAN PAGE MODAL -->
 <div id="man-modal">
   <div class="man-box">
-    <button class="man-close" onclick="document.getElementById('man-modal').classList.remove('open')">✕ fechar</button>
+    <button class="man-close" onclick="document.getElementById('man-modal').classList.remove('open')">x fechar</button>
     <h1 id="man-title"></h1>
     <div id="man-content"></div>
   </div>
@@ -463,6 +542,19 @@ canvas#cpu-chart{width:100%!important;height:70px!important}
 
 <script>
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+function iconSvg(name,cls="ic"){
+  const p={
+    terminal:'<path d="M3 4h18v16H3z"/><path d="M7 8l3 3-3 3M12 14h5" stroke="#cbd5e1" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    folder:'<path d="M2 6h7l2 2h11v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M2 9h20" stroke="#cbd5e1" stroke-width="1.4" fill="none"/>',
+    code:'<path d="M8 8L4 12l4 4M16 8l4 4-4 4M14 6l-4 12" stroke="#cbd5e1" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    globe:'<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a13 13 0 0 1 0 16M12 4a13 13 0 0 0 0 16" stroke="#cbd5e1" stroke-width="1.4" fill="none"/>',
+    chart:'<path d="M4 18h16M7 16v-4M12 16V8M17 16v-6" stroke="#cbd5e1" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    settings:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4" stroke="#cbd5e1" stroke-width="1.4" fill="none"/>',
+    flask:'<path d="M9 3h6M10 3v5l-4 7a2 2 0 0 0 1.7 3h8.6a2 2 0 0 0 1.7-3l-4-7V3" stroke="#cbd5e1" stroke-width="1.6" fill="none"/>',
+    book:'<path d="M4 5h7a3 3 0 0 1 3 3v10H7a3 3 0 0 0-3 3z"/><path d="M20 5h-7a3 3 0 0 0-3 3v10h7a3 3 0 0 1 3 3z"/>'
+  };
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="rgba(148,163,184,.18)" aria-hidden="true">${p[name]||""}</svg>`;
+}
 
 // ───── FILE SYSTEM ─────
 class FNode {
@@ -501,16 +593,19 @@ class VM {
       addFile(db,"config.json",'{\n  "db_host": "localhost",\n  "db_port": 5432,\n  "db_name": "produção",\n  "secret_key": "s3cr3t_k3y_n4o_c0mpartilhe"\n}');
       addFile(logs,"auth.log","May 18 09:01:02 zeus sshd[1337]: Accepted password for admin from 192.168.0.10 port 52211\nMay 18 09:05:14 zeus sudo: admin ran: cat /etc/passwd\nMay 18 09:08:32 zeus sshd[1338]: Failed password from 192.168.0.99 port 44312");
       addFile(logs,"access.log","[09:00] 192.168.0.1 GET /index.html 200\n[09:01] 192.168.0.10 POST /login 200\n[09:05] 192.168.0.42 GET /admin 403\n[09:08] 192.168.0.99 POST /login 401");
-      addFile(var_,"motd","Bem-vindo ao Zeus Server v2.1\nUso não autorizado é crime. Acesso monitorado.");
+      addFile(var_,"motd","Bem-vindo ao Zeus Server v2.1\nUso nao autorizado é crime. Acesso monitorado.");
     }
     this.currentDir=userDir;
     this.env={PATH:"/bin:/usr/bin",HOME:`/home/${user}`,USER:user,SHELL:"/bin/bash",TERM:"xterm-256color"};
+    this.packages=["nano","curl"];
+    this.git={commits:[],staged:[]};
   }
 }
 
 const localPC=new VM("termhacker","192.168.0.10","root",false);
 const remoteServer=new VM("zeus-server","192.168.0.42","admin",true);
 let machine=localPC;
+let currentProfile="root";
 let sandboxMode=false;
 let sandboxPC=null;
 let activeShellProfile="main";
@@ -540,12 +635,19 @@ function notify(title,body){
   const el=document.createElement("div");el.className="toast";
   el.innerHTML=`<div class="toast-title">${title}</div><div class="toast-body">${body}</div>`;
   wrap.appendChild(el);
+  const center=document.getElementById("notif-center");
+  if(center){
+    const item=document.createElement("div");
+    item.className="notif-item";
+    item.innerHTML=`<div class="toast-title">${title}</div><div class="toast-body">${body}</div>`;
+    center.prepend(item);
+  }
   setTimeout(()=>{el.style.opacity="0";el.style.transform="translateY(10px)";el.style.transition=".25s";},3600);
   setTimeout(()=>el.remove(),3900);
 }
 function updateSandboxUI(){
   const top=document.getElementById("sandbox-top"); if(top)top.textContent=sandboxMode?"ON":"OFF";
-  const chip=document.getElementById("sandbox-chip"); if(chip){chip.textContent=sandboxMode?"🧪 Sandbox ON":"🧪 Sandbox OFF";chip.classList.toggle("active",sandboxMode);}
+  const chip=document.getElementById("sandbox-chip"); if(chip){chip.innerHTML=`<i class="bi bi-beaker"></i> Sandbox ${sandboxMode?"ON":"OFF"}`;chip.classList.toggle("active",sandboxMode);}
   const quick=document.getElementById("quick-sandbox-label"); if(quick)quick.textContent=sandboxMode?"Ativado":"Desativado";
   const banner=document.getElementById("sandbox-banner"); if(banner)banner.classList.toggle("active",sandboxMode);
 }
@@ -554,14 +656,14 @@ function syncFileManagerToMachine(){
   renderFM();
 }
 function toggleSandbox(){
-  if(machine.isRemote){notify("Sandbox indisponível","Saia da sessão SSH antes de alternar o ambiente isolado.");return;}
+  if(machine.isRemote){notify("Sandbox indisponível","Saia da sessao SSH antes de alternar o ambiente isolado.");return;}
   if(!sandboxMode){
     sandboxPC=cloneVM(localPC,"sandbox");
     machine=sandboxPC;sandboxMode=true;activeShellProfile="sandbox";
-    notify("Sandbox ativado","Você está em uma cópia isolada da sessão local. Alterações serão descartadas ao sair.");
+    notify("Sandbox ativado","Você está em uma cópia isolada da sessao local. Alterações serão descartadas ao sair.");
   }else{
     machine=localPC;sandboxMode=false;sandboxPC=null;activeShellProfile="main";
-    notify("Sandbox encerrado","A sessão principal foi restaurada e as alterações isoladas foram descartadas.");
+    notify("Sandbox encerrado","A sessao principal foi restaurada e as alteracoes isoladas foram descartadas.");
   }
   updateSandboxUI();renderPrompt();syncFileManagerToMachine();
 }
@@ -600,6 +702,20 @@ function resolveNode(path){
   }
   return cur;
 }
+function toggleNotifCenter(){document.getElementById("notif-center")?.classList.toggle("open");}
+function openBrowserPage(key){
+  const pages={
+    docs:"<h3><i class='bi bi-journal-code'></i> Docs Linux</h3><p>Comandos principais, atalhos e boas práticas.</p>",
+    intranet:"<h3><i class='bi bi-building'></i> Intranet Dev</h3><p>Status: CI verde. Deploy agendado às 18:00.</p><p>Usuário atual: <b>"+machine.user+"</b> @ "+machine.hostname+"</p>",
+    ctf:"<h3><i class='bi bi-shield-lock'></i> CTF Arena</h3><p>Desafio ativo: encontre a flag em /var/log.</p>"
+  };
+  document.getElementById("browser-page").innerHTML=pages[key]||"Página nao encontrada.";
+}
+function ensureTrash(vm=machine){
+  const home=getHomeDir(vm);
+  if(!home.children[".trash"])home.children[".trash"]=new FNode(".trash","dir",home,"","rwxr-xr-x");
+  return home.children[".trash"];
+}
 
 // ───── TERMINAL ─────
 const output=document.getElementById("term-output");
@@ -627,6 +743,8 @@ function renderPrompt(){
   }
   const hostBadge=document.getElementById("settings-host");if(hostBadge)hostBadge.textContent=`host: ${machine.hostname}`;
   const pathBadge=document.getElementById("settings-path");if(pathBadge)pathBadge.textContent=`cwd: ${p}`;
+  const userName=document.getElementById("settings-user-name");if(userName)userName.textContent=machine.user;
+  const userRole=document.getElementById("settings-user-role");if(userRole)userRole.textContent=machine.user==="root"?"Administrador local":"Usuário padrão";
   updateSandboxUI();
 }
 
@@ -647,16 +765,16 @@ function colorLS(node){
 
 // ───── COMMANDS ─────
 const manPages={
-  ls:{name:"LS(1)",synopsis:"ls [OPÇÃO]... [ARQUIVO]...",desc:"Lista informações sobre os ARQUIVOs (do diretório atual por padrão).",opts:["-a  listar entradas ocultas começando com .  ","-l  usar formato de listagem longa","-h  tamanhos legíveis (1K 234M 2G)  ","-r  inverter ordem de classificação","-t  ordenar por data de modificação"]},
-  cd:{name:"CD(1)",synopsis:"cd [DIR]",desc:"Muda o diretório de trabalho do shell para DIR.",opts:["..  sobe um nível","/   vai para a raiz","~   vai para home"]},
+  ls:{name:"LS(1)",synopsis:"ls [OPÇÃO]... [ARQUIVO]...",desc:"Lista informacoes sobre os ARQUIVOs (do diretorio atual por padrão).",opts:["-a  listar entradas ocultas começando com .  ","-l  usar formato de listagem longa","-h  tamanhos legíveis (1K 234M 2G)  ","-r  inverter ordem de classificação","-t  ordenar por data de modificação"]},
+  cd:{name:"CD(1)",synopsis:"cd [DIR]",desc:"Muda o diretorio de trabalho do shell para DIR.",opts:["..  sobe um nível","/   vai para a raiz","~   vai para home"]},
   cat:{name:"CAT(1)",synopsis:"cat [OPÇÃO]... [ARQUIVO]...",desc:"Concatena arquivos e imprime na saída padrão.",opts:["-n  numera todas as linhas de saída","-A  mostra todos os caracteres especiais"]},
-  grep:{name:"GREP(1)",synopsis:"grep [OPÇÃO]... PADRÃO [ARQUIVO]...",desc:"Busca PADRÃO em cada ARQUIVO e imprime as linhas correspondentes.",opts:["-r  recursivo em diretórios","-i  ignora diferença de maiúsculas","-n  imprime número da linha","-c  conta ocorrências","-v  inverte correspondência (linhas que NÃO contêm)"]},
-  chmod:{name:"CHMOD(1)",synopsis:"chmod [MODO] ARQUIVO",desc:"Altera as permissões de acesso de um arquivo.",opts:["chmod +x arq  adiciona execução","chmod 755 arq  rwxr-xr-x","chmod 644 arq  rw-r--r--","chmod 600 arq  rw------- (privado)"]},
+  grep:{name:"GREP(1)",synopsis:"grep [OPÇÃO]... PADRÃO [ARQUIVO]...",desc:"Busca PADRÃO em cada ARQUIVO e imprime as linhas correspondentes.",opts:["-r  recursivo em diretorios","-i  ignora diferença de maiúsculas","-n  imprime número da linha","-c  conta ocorrências","-v  inverte correspondência (linhas que NÃO contêm)"]},
+  chmod:{name:"CHMOD(1)",synopsis:"chmod [MODO] ARQUIVO",desc:"Altera as permissoes de acesso de um arquivo.",opts:["chmod +x arq  adiciona execução","chmod 755 arq  rwxr-xr-x","chmod 644 arq  rw-r--r--","chmod 600 arq  rw------- (privado)"]},
 };
 
 const cmds={
   help:{desc:"Lista comandos",exec:async()=>{
-    const list=Object.entries(cmds).map(([k,v])=>`  <span style="color:var(--accent);font-weight:500">${k.padEnd(10)}</span> <span style="color:var(--text3)">—</span> ${v.desc}`).join("\n");
+    const list=Object.entries(cmds).map(([k,v])=>`  <span style="color:var(--accent);font-weight:500">${k.padEnd(10)}</span> <span style="color:var(--text3)">-</span> ${v.desc}`).join("\n");
     return `<span style="color:var(--text2)">Comandos disponíveis:</span>\n${list}\n\n<span style="color:var(--text3)">Use <span style="color:var(--yellow)">man [cmd]</span> para detalhes. Use <span style="color:var(--yellow)">TAB</span> para autocompletar.</span>`;
   }},
   man:{desc:"Manual de um comando",exec:async(args)=>{
@@ -679,12 +797,12 @@ const cmds={
     if(mode==="on"&&!sandboxMode){toggleSandbox();return`<span class="t-ok">Sandbox ativado.</span>`;}
     if(mode==="off"&&sandboxMode){toggleSandbox();return`<span class="t-ok">Sandbox desativado.</span>`;}
     if(mode==="reset"){resetSandbox();return sandboxMode?`<span class="t-ok">Sandbox resetado.</span>`:`<span class="t-warn">Ative o sandbox antes de resetar.</span>`;}
-    if(mode==="status")return sandboxMode?`<span class="t-ok">Sandbox: ON</span> — ambiente isolado ativo.`:`<span class="t-warn">Sandbox: OFF</span> — sessão principal ativa.`;
+    if(mode==="status")return sandboxMode?`<span class="t-ok">Sandbox: ON</span> - ambiente isolado ativo.`:`<span class="t-warn">Sandbox: OFF</span> - sessao principal ativa.`;
     return`Uso: sandbox [on|off|reset|status]`;
   }},
-  tree:{desc:"Mostra diretórios em árvore",exec:async(args)=>{
+  tree:{desc:"Mostra diretorios em árvore",exec:async(args)=>{
     const root=args[0]?resolveNode(args[0]):machine.currentDir;
-    if(!root)return`<span class="t-err">tree: caminho não encontrado</span>`;
+    if(!root)return`<span class="t-err">tree: caminho nao encontrado</span>`;
     const lines=[getFullPath(root)];
     function walk(node,prefix=""){
       const children=Object.values(node.children||{});
@@ -699,10 +817,10 @@ const cmds={
   stat:{desc:"Mostra metadados de um arquivo",exec:async(args)=>{
     if(!args[0])return`<span class="t-err">Uso: stat [arquivo]</span>`;
     const n=resolveNode(args[0]);
-    if(!n)return`<span class="t-err">stat: '${args[0]}': não encontrado</span>`;
-    return`Arquivo: ${n.name}\nTipo: ${n.type==="dir"?"diretório":"arquivo"}\nPermissões: ${n.perms}\nTamanho: ${(n.content||"").length} bytes\nModificado: ${n.mtime.toLocaleString("pt-BR")}`;
+    if(!n)return`<span class="t-err">stat: '${args[0]}': nao encontrado</span>`;
+    return`Arquivo: ${n.name}\nTipo: ${n.type==="dir"?"diretorio":"arquivo"}\nPermissoes: ${n.perms}\nTamanho: ${(n.content||"").length} bytes\nModificado: ${n.mtime.toLocaleString("pt-BR")}`;
   }},
-  id:{desc:"UID e grupos do usuário",exec:async()=>`uid=0(${machine.user}) gid=0(${machine.user}) groups=0(${machine.user}),4(adm),24(cdrom),27(sudo)`},
+  id:{desc:"UID e grupos do usuario",exec:async()=>`uid=0(${machine.user}) gid=0(${machine.user}) groups=0(${machine.user}),4(adm),24(cdrom),27(sudo)`},
   env:{desc:"Variáveis de ambiente",exec:async()=>Object.entries(machine.env).map(([k,v])=>`<span style="color:var(--accent)">${k}</span>=<span style="color:var(--text2)">${v}</span>`).join("\n")},
   echo:{desc:"Imprime/salva texto",exec:async(args,full)=>{
     if(full.includes(">")){
@@ -719,8 +837,8 @@ const cmds={
     const longFmt=args.includes("-l")||args.includes("-la")||args.includes("-al");
     const targetPath=args.find(a=>!a.startsWith("-"));
     const dir=targetPath?resolveNode(targetPath):machine.currentDir;
-    if(!dir)return`<span class="t-err">ls: não pode acessar '${targetPath}': Não existe</span>`;
-    if(dir.type!=="dir")return`<span class="t-err">ls: '${targetPath}': Não é um diretório</span>`;
+    if(!dir)return`<span class="t-err">ls: nao pode acessar '${targetPath}': Não existe</span>`;
+    if(dir.type!=="dir")return`<span class="t-err">ls: '${targetPath}': Não é um diretorio</span>`;
     let entries=Object.values(dir.children);
     if(!showHidden)entries=entries.filter(n=>!n.name.startsWith("."));
     if(entries.length===0)return"";
@@ -735,16 +853,16 @@ const cmds={
     }
     return entries.map(colorLS).join("  ");
   }},
-  cd:{desc:"Muda diretório",exec:async(args)=>{
+  cd:{desc:"Muda diretorio",exec:async(args)=>{
     const t=args[0];
     if(!t||t==="~"){machine.currentDir=machine.root.children.home.children[machine.user];return""}
     if(t==="/"){machine.currentDir=machine.root;return""}
     const node=resolveNode(t);
-    if(!node)return`<span class="t-err">cd: ${t}: Diretório não encontrado</span>`;
-    if(node.type!=="dir")return`<span class="t-err">cd: ${t}: Não é um diretório</span>`;
+    if(!node)return`<span class="t-err">cd: ${t}: Diretório nao encontrado</span>`;
+    if(node.type!=="dir")return`<span class="t-err">cd: ${t}: Não é um diretorio</span>`;
     machine.currentDir=node;return"";
   }},
-  mkdir:{desc:"Cria diretório",exec:async(args)=>{
+  mkdir:{desc:"Cria diretorio",exec:async(args)=>{
     if(!args.length)return`<span class="t-err">Uso: mkdir [nome]</span>`;
     const nm=args[args.length-1];
     if(machine.currentDir.children[nm])return`<span class="t-err">mkdir: '${nm}': Já existe</span>`;
@@ -756,11 +874,11 @@ const cmds={
     else machine.currentDir.children[args[0]].mtime=new Date();
     return"";
   }},
-  cat:{desc:"Exibe conteúdo de arquivo",exec:async(args)=>{
+  cat:{desc:"Exibe conteudo de arquivo",exec:async(args)=>{
     if(!args.length)return`<span class="t-err">Uso: cat [arquivo]</span>`;
     const n=resolveNode(args[0]);
-    if(!n)return`<span class="t-err">cat: ${args[0]}: Arquivo não encontrado</span>`;
-    if(n.type==="dir")return`<span class="t-err">cat: ${args[0]}: É um diretório</span>`;
+    if(!n)return`<span class="t-err">cat: ${args[0]}: Arquivo nao encontrado</span>`;
+    if(n.type==="dir")return`<span class="t-err">cat: ${args[0]}: É um diretorio</span>`;
     const numbered=args.includes("-n");
     const lines=n.content.split("\n");
     if(numbered)return lines.map((l,i)=>`<span style="color:var(--text3)">${String(i+1).padStart(4)}  </span>${l}`).join("\n");
@@ -772,13 +890,48 @@ const cmds={
     const recursive=args.includes("-r")||args.includes("-rf");
     const n=machine.currentDir.children[fname];
     if(!n)return`<span class="t-err">rm: '${fname}': Não encontrado</span>`;
-    if(n.type==="dir"&&!recursive)return`<span class="t-err">rm: '${fname}': É um diretório. Use -r para remover</span>`;
-    delete machine.currentDir.children[fname];return"";
+    if(n.type==="dir"&&!recursive)return`<span class="t-err">rm: '${fname}': É um diretorio. Use -r para remover</span>`;
+    const trash=ensureTrash(machine);
+    trash.children[`${Date.now()}_${fname}`]=new FNode(n.name,n.type,trash,n.content||"",n.perms);
+    delete machine.currentDir.children[fname];
+    return`Movido para lixeira: ${fname}`;
   }},
-  cp:{desc:"Copia arquivo",exec:async(args)=>{
+  trash:{desc:"Gerencia lixeira",exec:async(args)=>{
+    const trash=ensureTrash(machine),op=(args[0]||"ls").toLowerCase();
+    if(op==="ls")return Object.keys(trash.children).join("\n")||"(vazia)";
+    if(op==="empty"){trash.children={};return"Lixeira esvaziada";}
+    if(op==="restore"){
+      const k=args[1]; if(!k||!trash.children[k])return"Uso: trash restore [item]";
+      machine.currentDir.children[trash.children[k].name]=trash.children[k]; delete trash.children[k]; return"Item restaurado";
+    }
+    return"Uso: trash [ls|empty|restore]";
+  }},
+  apt:{desc:"Pacotes simulados",exec:async(args)=>{
+    const op=(args[0]||"").toLowerCase();
+    if(op==="list")return machine.packages.join("\n");
+    if(op==="install"){const pkg=args[1];if(!pkg)return"Uso: apt install [pacote]";if(!machine.packages.includes(pkg))machine.packages.push(pkg);return`Instalado: ${pkg}`;}
+    return"Uso: apt [list|install]";
+  }},
+  git:{desc:"Git simulado",exec:async(args)=>{
+    const op=(args[0]||"status").toLowerCase();
+    if(op==="init"){machine.git={commits:[],staged:[]};return"Initialized empty Git repository";}
+    if(op==="status")return`On branch main\nstaged: ${machine.git.staged.join(", ")||"(none)"}`;
+    if(op==="add"){const f=args[1];if(!f)return"Uso: git add [arquivo]";machine.git.staged.push(f);return`added ${f}`;}
+    if(op==="commit"){const msg=(args.join(" ").match(/-m\s+["'](.+)["']/)||[])[1]||"commit";machine.git.commits.unshift({msg,at:new Date().toLocaleString("pt-BR"),files:[...machine.git.staged]});machine.git.staged=[];return`[main] ${msg}`;}
+    if(op==="log")return machine.git.commits.map(c=>`commit ${c.at}\n  ${c.msg}\n  files: ${c.files.join(", ")||"-"}`).join("\n\n")||"(sem commits)";
+    return"Uso: git [init|status|add|commit|log]";
+  }},
+  login:{desc:"Troca perfil",exec:async(args)=>{
+    const p=(args[0]||"").toLowerCase();
+    if(!["root","dev","guest"].includes(p))return"Uso: login [root|dev|guest]";
+    currentProfile=p; machine.user=p; machine.env.USER=p; machine.env.HOME=`/home/${p}`;
+    if(!machine.root.children.home.children[p])machine.root.children.home.children[p]=new FNode(p,"dir",machine.root.children.home,"","rwxr-xr-x");
+    machine.currentDir=machine.root.children.home.children[p];
+    return`Perfil ativo: ${p}`;
+  }},  cp:{desc:"Copia arquivo",exec:async(args)=>{
     if(args.length<2)return`<span class="t-err">Uso: cp origem destino</span>`;
     const src=resolveNode(args[0]);
-    if(!src||src.type==="dir")return`<span class="t-err">cp: '${args[0]}': Não encontrado ou é diretório</span>`;
+    if(!src||src.type==="dir")return`<span class="t-err">cp: '${args[0]}': Não encontrado ou é diretorio</span>`;
     machine.currentDir.children[args[1]]=new FNode(args[1],"file",machine.currentDir,src.content,src.perms);
     return"";
   }},
@@ -797,7 +950,7 @@ const cmds={
     const fname=rest[1];
     const n=resolveNode(fname);
     if(!n)return`<span class="t-err">grep: '${fname}': Não encontrado</span>`;
-    if(n.type==="dir")return`<span class="t-err">grep: '${fname}': É um diretório</span>`;
+    if(n.type==="dir")return`<span class="t-err">grep: '${fname}': É um diretorio</span>`;
     const ci=opts.includes("-i");
     const showNum=opts.includes("-n");
     const matches=n.content.split("\n").map((l,i)=>({l,i})).filter(({l})=>ci?l.toLowerCase().includes(term.toLowerCase()):l.includes(term));
@@ -825,7 +978,7 @@ const cmds={
     const fname=args.find(a=>!a.startsWith("-"));
     if(!fname)return`<span class="t-err">Uso: wc [-l|-w|-c] arquivo</span>`;
     const n=resolveNode(fname);
-    if(!n||n.type==="dir")return`<span class="t-err">wc: arquivo não encontrado</span>`;
+    if(!n||n.type==="dir")return`<span class="t-err">wc: arquivo nao encontrado</span>`;
     const lines=n.content.split("\n").length;
     const words=n.content.split(/\s+/).filter(Boolean).length;
     const chars=n.content.length;
@@ -834,15 +987,15 @@ const cmds={
     if(args.includes("-c"))return`${chars} ${fname}`;
     return`${lines} ${words} ${chars} ${fname}`;
   }},
-  chmod:{desc:"Permissões de arquivo",exec:async(args)=>{
+  chmod:{desc:"Permissoes de arquivo",exec:async(args)=>{
     if(args.length<2)return`<span class="t-err">Uso: chmod [modo] arquivo</span>`;
     const n=resolveNode(args[1]);
     if(!n)return`<span class="t-err">chmod: '${args[1]}': Não encontrado</span>`;
-    if(args[0]==="+x"){n.perms="rwxr-xr-x";return`<span class="t-ok">${args[1]}: permissão de execução adicionada</span>`}
+    if(args[0]==="+x"){n.perms="rwxr-xr-x";return`<span class="t-ok">${args[1]}: permissao de execução adicionada</span>`}
     if(args[0]==="755"){n.perms="rwxr-xr-x";return""}
     if(args[0]==="644"){n.perms="rw-r--r--";return""}
     if(args[0]==="600"){n.perms="rw-------";return""}
-    return`<span class="t-err">chmod: modo '${args[0]}' não reconhecido</span>`;
+    return`<span class="t-err">chmod: modo '${args[0]}' nao reconhecido</span>`;
   }},
   df:{desc:"Uso de disco",exec:async()=>`Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        28G   8.2G  18G  32% /\ntmpfs           2.0G     0  2.0G   0% /dev/shm`},
   ps:{desc:"Lista processos",exec:async()=>`PID TTY          TIME CMD\n  1 ?        00:00:02 systemd\n 42 ?        00:00:00 sshd\n${Math.floor(Math.random()*9000+1000)} pts/0    00:00:00 bash\n${Math.floor(Math.random()*9000+1000)} pts/0    00:00:00 ps`},
@@ -860,7 +1013,7 @@ const cmds={
   // HACKING CMDS
   scan:{desc:"[NET] Varre rede local",exec:async()=>{
     if(machine.isRemote)return`<span class="t-err">scan: disponível apenas no localhost</span>`;
-    printLine(`<span class="t-sys">Iniciando varredura ARP — sub-rede 192.168.0.0/24</span>`);
+    printLine(`<span class="t-sys">Iniciando varredura ARP - sub-rede 192.168.0.0/24</span>`);
     const hosts=[{ip:"192.168.0.1",host:"gateway",ports:"80,443"},{ip:"192.168.0.10",host:"termhacker",ports:"22,80"},{ip:"192.168.0.42",host:"zeus-server",ports:"22,80,5432"}];
     for(const h of hosts){
       await sleep(600);
@@ -872,7 +1025,7 @@ const cmds={
     if(machine.isRemote)return`<span class="t-err">Indisponível remotamente</span>`;
     if(!args[0])return`<span class="t-err">Uso: crack [IP]</span>`;
     if(args[0]!==remoteServer.ip)return`<span class="t-err">Alvo fora de alcance</span>`;
-    printLine(`<span style="color:var(--red)">Iniciando Hydra v9.4 — ataque de dicionário SSH contra ${args[0]}</span>`);
+    printLine(`<span style="color:var(--red)">Iniciando Hydra v9.4 - ataque de dicionário SSH contra ${args[0]}</span>`);
     const wordlist=["admin","root","123456","password","ubuntu","qwerty","zeus2024","senha123"];
     for(const w of wordlist){
       await sleep(400);
@@ -883,7 +1036,7 @@ const cmds={
     return`<span class="t-err">Wordlist esgotada.</span>`;
   }},
   ssh:{desc:"[NET] Conecta via SSH",exec:async(args)=>{
-    if(sandboxMode)return`<span class="t-warn">ssh bloqueado no sandbox: saia do ambiente isolado para abrir uma sessão remota.</span>`;
+    if(sandboxMode)return`<span class="t-warn">ssh bloqueado no sandbox: saia do ambiente isolado para abrir uma sessao remota.</span>`;
     if(!args[0])return`<span class="t-err">Uso: ssh user@host</span>`;
     const [user,ip]=(args[0].includes("@")?args[0]:"").split("@");
     if(ip!==remoteServer.ip||user!==remoteServer.user)return`<span class="t-err">ssh: connect to host ${ip||args[0]} port 22: Connection refused</span>`;
@@ -900,10 +1053,10 @@ const cmds={
     renderFM();
     const motd=remoteServer.root.children.var?.children?.motd;
     if(motd)printLine(`\n<span style="color:var(--yellow)">${motd.content}</span>\n`);
-    return`<span class="t-ok">Conexão SSH estabelecida ✓</span>`;
+    return`<span class="t-ok">Conexao SSH estabelecida OK</span>`;
   }},
-  exit:{desc:"Encerra sessão/SSH",exec:async()=>{
-    if(!machine.isRemote)return`<span class="t-err">logout: sem sessão ativa para encerrar</span>`;
+  exit:{desc:"Encerra sessao/SSH",exec:async()=>{
+    if(!machine.isRemote)return`<span class="t-err">logout: sem sessao ativa para encerrar</span>`;
     printLine(`<span class="t-sys">Connection to ${machine.ip} closed.</span>`);
     await sleep(400);machine=localPC;fmNode=getHomeDir(machine);renderFM();
     return`<span class="t-ok">Retornando ao localhost...</span>`;
@@ -927,11 +1080,11 @@ const cmds={
 
 // ───── MISSIONS ─────
 const missions=[
-  {lvl:1,cat:"NAVEGAÇÃO",desc:"Bem-vindo! Comece verificando o conteúdo da pasta atual.",hint:"ls",check:c=>c==="ls"},
-  {lvl:2,cat:"NAVEGAÇÃO",desc:"Acesse a pasta <b>documentos</b> dentro do seu diretório.",hint:"cd documentos",check:c=>c.startsWith("cd ")&&machine.currentDir.name==="documentos"},
-  {lvl:3,cat:"ARQUIVOS",desc:"Leia o conteúdo de <b>notas.txt</b>.",hint:"cat notas.txt",check:c=>c.includes("cat")&&c.includes("notas.txt")},
+  {lvl:1,cat:"NAVEGAÇÃO",desc:"Bem-vindo! Comece verificando o conteudo da pasta atual.",hint:"ls",check:c=>c==="ls"},
+  {lvl:2,cat:"NAVEGAÇÃO",desc:"Acesse a pasta <b>documentos</b> dentro do seu diretorio.",hint:"cd documentos",check:c=>c.startsWith("cd ")&&machine.currentDir.name==="documentos"},
+  {lvl:3,cat:"ARQUIVOS",desc:"Leia o conteudo de <b>notas.txt</b>.",hint:"cat notas.txt",check:c=>c.includes("cat")&&c.includes("notas.txt")},
   {lvl:4,cat:"ARQUIVOS",desc:"Volte para a pasta anterior com o caminho especial <b>..</b>",hint:"cd ..",check:c=>c==="cd .."},
-  {lvl:5,cat:"SISTEMA",desc:"Descubra informações completas do kernel com a flag correta.",hint:"uname -a",check:c=>c==="uname -a"},
+  {lvl:5,cat:"SISTEMA",desc:"Descubra informacoes completas do kernel com a flag correta.",hint:"uname -a",check:c=>c==="uname -a"},
   {lvl:6,cat:"ARQUIVOS",desc:"Crie uma nova pasta chamada <b>hack</b>.",hint:"mkdir hack",check:c=>c==="mkdir hack"&&machine.currentDir.children["hack"]},
   {lvl:7,cat:"TEXTO",desc:"Crie um arquivo de senhas via redirecionamento de texto.",hint:"echo \"senha123\" > pass.txt",check:c=>c.startsWith("echo ")&&c.includes("> pass.txt")&&machine.currentDir.children["pass.txt"]},
   {lvl:8,cat:"BUSCA",desc:"Use grep para procurar por <b>Aprender</b> no arquivo notas.txt (ele está em documentos).",hint:'grep "Aprender" documentos/notas.txt',check:c=>c.startsWith("grep")&&c.includes("notas.txt")},
@@ -940,23 +1093,40 @@ const missions=[
   {lvl:11,cat:"PENTEST",desc:"Credenciais obtidas! Estabeleça uma conexão SSH com o servidor.",hint:"ssh admin@192.168.0.42",check:c=>c==="ssh admin@192.168.0.42"},
   {lvl:12,cat:"INFILTRAÇÃO",desc:"Você está no servidor remoto. Navegue até o banco de dados e leia <b>users.db</b>.",hint:"cd database && cat users.db",check:c=>(c.includes("cat")&&c.includes("users.db"))&&machine.isRemote},
   {lvl:13,cat:"FURTIVIDADE",desc:"Apague seus rastros! Navegue até var/log e remova <b>auth.log</b>.",hint:"cd /var/log && rm auth.log",check:c=>c.includes("rm")&&c.includes("auth.log")&&machine.isRemote},
-  {lvl:14,cat:"CONCLUSÃO",desc:"Missão concluída. Encerre a sessão SSH e volte ao localhost.",hint:"exit",check:(c,out)=>c==="exit"&&!machine.isRemote},
+  {lvl:14,cat:"CONCLUSÃO",desc:"Missão concluída. Encerre a sessao SSH e volte ao localhost.",hint:"exit",check:(c,out)=>c==="exit"&&!machine.isRemote},
 ];
 let missionIdx=0;
+let snapshotStore=null;
+const missionTracks={
+  linux:[
+    {lvl:1,cat:"LINUX",desc:"Liste arquivos.",hint:"ls",check:c=>c==="ls"},
+    {lvl:2,cat:"LINUX",desc:"Crie pasta lab.",hint:"mkdir lab",check:c=>c==="mkdir lab"},
+  ],
+  rede:[
+    {lvl:1,cat:"REDE",desc:"Faça scan da rede.",hint:"scan",check:c=>c==="scan"},
+    {lvl:2,cat:"REDE",desc:"Ping no gateway.",hint:"ping 192.168.0.1",check:c=>c.startsWith("ping 192.168.0.1")},
+  ],
+  dev:[
+    {lvl:1,cat:"DEV",desc:"Inicie git.",hint:"git init",check:c=>c==="git init"},
+    {lvl:2,cat:"DEV",desc:"Veja status.",hint:"git status",check:c=>c==="git status"},
+  ]
+};
+let activeTrack="linux";
 
 function updateMission(){
-  const total=missions.length;
+  const currentMissions=missionTracks[activeTrack]||missions;
+  const total=currentMissions.length;
   document.getElementById("m-total").textContent=total;
   if(missionIdx>=total){
     document.getElementById("m-step").textContent=total;
-    document.getElementById("m-lvl").textContent="★";
+    document.getElementById("m-lvl").textContent="*";
     document.getElementById("m-bar").style.width="100%";
     document.getElementById("m-category").textContent="COMPLETO";
-    document.getElementById("m-desc").innerHTML=`<span style="color:var(--green);font-weight:600">🎉 Parabéns! Você completou todas as missões.</span><br><br>Você dominou navegação, manipulação de arquivos, busca e técnicas básicas de rede em Linux.`;
+    document.getElementById("m-desc").innerHTML=`<span style="color:var(--green);font-weight:600"><i class="bi bi-check2-circle"></i> Parabéns! Você completou todas as missoes.</span><br><br>Você dominou navegação, manipulação de arquivos, busca e técnicas básicas de rede em Linux.`;
     document.getElementById("m-hint").style.display="none";
     return;
   }
-  const m=missions[missionIdx];
+  const m=currentMissions[missionIdx];
   document.getElementById("m-step").textContent=missionIdx+1;
   document.getElementById("m-lvl").textContent=m.lvl;
   document.getElementById("m-category").textContent=m.cat;
@@ -965,9 +1135,41 @@ function updateMission(){
   document.getElementById("m-hint").style.display="none";
 }
 function revealHint(){
-  if(missionIdx>=missions.length)return;
-  document.getElementById("m-hint-cmd").textContent=missions[missionIdx].hint;
+  const currentMissions=missionTracks[activeTrack]||missions;
+  if(missionIdx>=currentMissions.length)return;
+  document.getElementById("m-hint-cmd").textContent=currentMissions[missionIdx].hint;
   document.getElementById("m-hint").style.display="block";
+}
+function setMissionTrack(track){
+  if(!missionTracks[track])return;
+  activeTrack=track; missionIdx=0; updateMission();
+  notify("Trilhas",`Trilha ativa: ${track}`);
+}
+function saveSnapshot(){
+  snapshotStore={machine:cloneVM(machine,"snapshot"),fmPath:getFullPath(fmNode),missionIdx,activeTrack};
+  notify("Snapshot","Estado salvo.");
+}
+function restoreSnapshot(){
+  if(!snapshotStore)return notify("Snapshot","Nenhum snapshot salvo.");
+  machine=snapshotStore.machine;
+  missionIdx=snapshotStore.missionIdx||0;
+  activeTrack=snapshotStore.activeTrack||"linux";
+  fmNode=resolveNode(snapshotStore.fmPath)||getHomeDir(machine);
+  renderPrompt();renderFM();updateMission();renderCodeExplorer();
+  notify("Snapshot","Estado restaurado.");
+}
+function applyThemePack(pack){
+  const desktop=document.getElementById("desktop");
+  const packs={
+    aurora:{accent:"cyan",bg:"radial-gradient(circle at 20% 30%,rgba(34,211,238,.18),transparent 45%), radial-gradient(circle at 80% 10%,rgba(129,140,248,.18),transparent 40%), linear-gradient(135deg,#0b1020,#111827)"},
+    sunset:{accent:"amber",bg:"radial-gradient(circle at 20% 20%,rgba(251,191,36,.18),transparent 45%), radial-gradient(circle at 80% 70%,rgba(248,113,113,.18),transparent 40%), linear-gradient(135deg,#1a1020,#2b1a14)"},
+    matrix:{accent:"green",bg:"repeating-linear-gradient(180deg,rgba(74,222,128,.06) 0 2px,transparent 2px 8px), linear-gradient(135deg,#020705,#03130a)"},
+    ocean:{accent:"blue",bg:"radial-gradient(circle at 70% 20%,rgba(96,165,250,.2),transparent 40%), radial-gradient(circle at 10% 80%,rgba(34,211,238,.16),transparent 45%), linear-gradient(135deg,#071225,#0b1b33)"}
+  };
+  const p=packs[pack]; if(!p)return;
+  applyTheme(p.accent);
+  desktop.style.backgroundImage=p.bg;
+  notify("Loja de Temas",`Tema aplicado: ${pack}`);
 }
 
 // ───── INPUT ─────
@@ -1027,7 +1229,7 @@ async function executeSingleCommand(input){
     try{result=await cmds[name].exec(args,input);}
     catch(err){result=`<span class="t-err">Erro interno: ${err.message}</span>`;}
   } else {
-    result=`<span class="t-err">bash: ${name}: comando não encontrado</span>`;
+    result=`<span class="t-err">bash: ${name}: comando nao encontrado</span>`;
   }
   return result;
 }
@@ -1053,9 +1255,10 @@ async function processCmd(raw){
   }
 
   renderPrompt();
-  if(missionIdx<missions.length&&missions[missionIdx].check(input,lastResult||"")){
+  const currentMissions=missionTracks[activeTrack]||missions;
+  if(missionIdx<currentMissions.length&&currentMissions[missionIdx].check(input,lastResult||"")){
     await sleep(100);
-    printLine(`\n<span style="color:var(--green);font-weight:700">[✓] ${["Perfeito!","Ótimo!","Correto!","Excelente!"][Math.floor(Math.random()*4)]} — ${missions[missionIdx].cat}: missão concluída.</span>\n`,"");
+    printLine(`\n<span style="color:var(--green);font-weight:700">[OK] ${["Perfeito!","Ótimo!","Correto!","Excelente!"][Math.floor(Math.random()*4)]} - ${currentMissions[missionIdx].cat}: missao concluída.</span>\n`,"");
     missionIdx++;updateMission();
   }
   isProcessing=false;realInput.disabled=false;realInput.value="";cmdDisplay.textContent="";
@@ -1124,7 +1327,7 @@ function makeWinDraggable(winId,barId){
   });
   win.addEventListener("mousedown",()=>{document.querySelectorAll(".win").forEach(w=>w.style.zIndex="10");win.style.zIndex="30";});
 }
-["term","mission","sysmon","files","settings"].forEach(id=>makeWinDraggable(`win-${id}`,`win-${id}-bar`));
+["term","mission","sysmon","files","settings","code","browser"].forEach(id=>makeWinDraggable(`win-${id}`,`win-${id}-bar`));
 
 // ───── WINDOW MANAGEMENT ─────
 function openWindow(id){
@@ -1134,7 +1337,15 @@ function openWindow(id){
   w.style.zIndex="30";
   if(id==="win-term")realInput.focus();
   if(id==="win-sysmon")startSysmon();
+  if(id==="win-code")renderCodeExplorer();
+  if(id==="win-browser")openBrowserPage("docs");
 }
+document.addEventListener("keydown",e=>{
+  if(e.key==="F1"){e.preventDefault();toggleAppMenu();}
+  if(e.key==="F2"){e.preventDefault();toggleQuickPanel();}
+  if(e.key==="F3"){e.preventDefault();toggleNotifCenter();}
+  if(e.altKey&&e.key==="Tab"){e.preventDefault();openWindow("win-term");}
+});
 function closeWin(id){const w=document.getElementById(id);if(w)w.style.display="none";}
 function minimizeWin(id){closeWin(id);}
 let maxed={};
@@ -1186,25 +1397,197 @@ function startSysmon(){
 
 // ───── FILE MANAGER ─────
 let fmNode=getHomeDir(machine);
+let codeCurrentNode=null;
+let codeTabs=[];
+let fmSelectedNode=null;
 function fmNavigate(key){
   if(key==="home")fmNode=getHomeDir(machine);
   if(key==="root")fmNode=machine.root;
   renderFM();
 }
 function fmBack(){if(fmNode.parent)fmNode=fmNode.parent;renderFM();}
+function fmCreateFolder(){
+  const name=prompt("Nome da nova pasta:");
+  if(!name)return;
+  if(fmNode.children[name])return notify("Arquivos","Já existe item com esse nome.");
+  fmNode.children[name]=new FNode(name,"dir",fmNode,"","rwxr-xr-x");
+  notify("Arquivos",`Pasta "${name}" criada.`);
+  renderFM();renderCodeExplorer();
+}
+function fmCreateFile(){
+  const name=prompt("Nome do novo arquivo:");
+  if(!name)return;
+  if(fmNode.children[name])return notify("Arquivos","Já existe item com esse nome.");
+  fmNode.children[name]=new FNode(name,"file",fmNode,"");
+  notify("Arquivos",`Arquivo "${name}" criado.`);
+  renderFM();renderCodeExplorer();
+}
 function renderFM(){
   document.getElementById("fm-path-bar").value=getFullPath(fmNode);
   const grid=document.getElementById("fm-grid");
   grid.innerHTML="";
   Object.values(fmNode.children).forEach(n=>{
-    const icon=n.type==="dir"?"📁":n.name.endsWith(".sh")?"📜":n.name.endsWith(".txt")||n.name.endsWith(".md")?"📄":n.name.endsWith(".db")||n.name.endsWith(".json")?"🗄️":"📄";
+    const icon=n.type==="dir"?"<i class='bi bi-folder2-open'></i>":n.name.endsWith(".sh")?"<i class='bi bi-file-earmark-code'></i>":n.name.endsWith(".txt")||n.name.endsWith(".md")?"<i class='bi bi-file-earmark-text'></i>":n.name.endsWith(".db")||n.name.endsWith(".json")?"<i class='bi bi-file-earmark-zip'></i>":"<i class='bi bi-file-earmark-text'></i>";
     const el=document.createElement("div");
     el.className="fm-file-item";
     el.innerHTML=`<span class="fi-icon">${icon}</span><span class="fi-name">${n.name}${n.type==="dir"?"":""}</span>`;
     el.ondblclick=()=>{if(n.type==="dir"){fmNode=n;renderFM();}else showFilePreview(n.name,n.content||"(arquivo vazio)");};
+    el.oncontextmenu=(ev)=>{ev.preventDefault();fmSelectedNode=n;openContextMenu(ev.clientX,ev.clientY,[
+      {label:"Abrir",icon:"bi-box-arrow-in-up-right",action:()=>{if(n.type==="dir"){fmNode=n;renderFM();}else showFilePreview(n.name,n.content||"(arquivo vazio)");}},
+      {label:"Renomear",icon:"bi-pencil",action:()=>fmRenameSelected()},
+      {label:"Excluir",icon:"bi-trash",action:()=>fmDeleteSelected()}
+    ]);};
     grid.appendChild(el);
   });
 }
+function fmRenameSelected(){
+  if(!fmSelectedNode||!fmSelectedNode.parent)return;
+  const nn=prompt("Novo nome:",fmSelectedNode.name); if(!nn||nn===fmSelectedNode.name)return;
+  if(fmSelectedNode.parent.children[nn])return notify("Arquivos","Nome já existe.");
+  delete fmSelectedNode.parent.children[fmSelectedNode.name];
+  fmSelectedNode.name=nn;
+  fmSelectedNode.parent.children[nn]=fmSelectedNode;
+  renderFM();renderCodeExplorer();
+}
+function fmDeleteSelected(){
+  if(!fmSelectedNode||!fmSelectedNode.parent)return;
+  delete fmSelectedNode.parent.children[fmSelectedNode.name];
+  renderFM();renderCodeExplorer();
+}
+function flattenFiles(node,base="",acc=[]){
+  Object.values(node.children).forEach(n=>{
+    const p=`${base}/${n.name}`.replace("//","/");
+    if(n.type==="file")acc.push({path:p,node:n});
+    else flattenFiles(n,p,acc);
+  });
+  return acc;
+}
+function renderCodeExplorer(){
+  const box=document.getElementById("code-explorer");
+  if(!box)return;
+  const files=flattenFiles(getHomeDir(machine),"");
+  box.innerHTML=files.map(f=>`<div class="code-file ${codeCurrentNode===f.node?"active":""}" data-path="${f.path}">${f.path}</div>`).join("");
+  box.querySelectorAll(".code-file").forEach(el=>{
+    el.onclick=()=>{
+      const file=files.find(f=>f.path===el.dataset.path);
+      if(!file)return;
+      codeCurrentNode=file.node;
+      if(!codeTabs.find(t=>t.path===file.path))codeTabs.push({path:file.path,node:file.node});
+      document.getElementById("code-current-file").textContent=file.path;
+      document.getElementById("code-editor").value=file.node.content||"";
+      updateCodeLanguage(file.path);
+      renderCodeTabs();
+      renderCodeExplorer();
+    };
+  });
+}
+function updateCodeLanguage(path){
+  const el=document.getElementById("code-language"); if(!el)return;
+  const ext=(path.split(".").pop()||"").toLowerCase();
+  const map={sh:"Shell Script",js:"JavaScript",json:"JSON",md:"Markdown",txt:"Plain Text"};
+  el.textContent=map[ext]||"Plain Text";
+}
+function appendCodeConsole(text){
+  const out=document.getElementById("code-console"); if(!out)return;
+  out.textContent += "\n"+text;
+  out.scrollTop=out.scrollHeight;
+}
+function renderCodeTabs(){
+  const box=document.getElementById("code-tabs");
+  if(!box)return;
+  box.innerHTML=codeTabs.map(t=>`<div class="code-tab ${codeCurrentNode===t.node?"active":""}" data-path="${t.path}">${t.path.split("/").pop()} <span data-close="${t.path}" style="opacity:.7;margin-left:6px">×</span></div>`).join("");
+  box.querySelectorAll(".code-tab").forEach(el=>{
+    el.onclick=()=>{
+      const t=codeTabs.find(x=>x.path===el.dataset.path||x.path.endsWith("/"+el.textContent));
+      if(!t)return;
+      codeCurrentNode=t.node;
+      document.getElementById("code-current-file").textContent=t.path;
+      document.getElementById("code-editor").value=t.node.content||"";
+      updateCodeLanguage(t.path);
+      renderCodeTabs();
+    };
+  });
+  box.querySelectorAll("[data-close]").forEach(el=>el.onclick=(e)=>{e.stopPropagation();const p=el.getAttribute("data-close");codeTabs=codeTabs.filter(t=>t.path!==p);if(codeCurrentNode&&codeCurrentNode===codeTabs.find(x=>x.path===p)?.node)codeCurrentNode=null;renderCodeTabs();});
+}
+function codeSaveFile(){
+  if(!codeCurrentNode)return notify("Mini Code","Abra um arquivo primeiro.");
+  codeCurrentNode.content=document.getElementById("code-editor").value;
+  codeCurrentNode.mtime=new Date();
+  notify("Mini Code",`Salvo: ${codeCurrentNode.name}`);
+}
+function runShellScript(content){
+  const lines=content.split("\n");
+  const out=[];
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line||line.startsWith("#"))continue;
+    if(line.startsWith("echo ")){out.push(line.slice(5).replace(/^['"]|['"]$/g,""));continue;}
+    if(line==="pwd"){out.push(getFullPath(machine.currentDir));continue;}
+    if(line==="ls"){out.push(Object.keys(machine.currentDir.children).join("  "));continue;}
+    if(line.startsWith("cat ")){const f=line.slice(4).trim();const n=resolveNode(f);out.push(n&&n.type==="file"?(n.content||""):`cat: ${f}: nao encontrado`);continue;}
+    out.push(`comando nao suportado no runner: ${line}`);
+  }
+  return out.join("\n")||"(sem output)";
+}
+function codeRunFile(){
+  if(!codeCurrentNode)return notify("Mini Code","Abra um arquivo.");
+  codeSaveFile();
+  const name=codeCurrentNode.name.toLowerCase();
+  const consoleEl=document.getElementById("code-console");
+  if(consoleEl)consoleEl.textContent=`$ run ${codeCurrentNode.name}`;
+  if(name.endsWith(".sh")){
+    appendCodeConsole(runShellScript(codeCurrentNode.content||""));
+    appendCodeConsole("[exit 0]");
+    return;
+  }
+  appendCodeConsole("Runner disponivel apenas para .sh no momento.");
+}
+function codeNewFile(){
+  const name=prompt("Novo arquivo (na pasta atual do Arquivos):");
+  if(!name)return;
+  if(fmNode.children[name])return notify("Mini Code","Esse nome já existe.");
+  fmNode.children[name]=new FNode(name,"file",fmNode,"");
+  renderFM();renderCodeExplorer();
+}
+document.getElementById("code-editor")?.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.key.toLowerCase()==="s"){e.preventDefault();codeSaveFile();return;}
+  if(e.ctrlKey&&e.key.toLowerCase()==="f"){
+    e.preventDefault();
+    const term=prompt("Buscar no arquivo:");
+    if(!term)return;
+    const ta=document.getElementById("code-editor");
+    const i=ta.value.indexOf(term);
+    if(i>=0){ta.focus();ta.setSelectionRange(i,i+term.length);notify("Mini Code",`Encontrado: "${term}"`);}
+    else notify("Mini Code","Texto nao encontrado.");
+  }
+});
+document.getElementById("code-editor")?.addEventListener("click",()=>{
+  const ta=document.getElementById("code-editor"); if(!ta)return;
+  const before=ta.value.slice(0,ta.selectionStart).split("\n");
+  document.getElementById("code-pos").textContent=`Ln ${before.length}, Col ${before[before.length-1].length+1}`;
+});
+document.getElementById("code-editor")?.addEventListener("keyup",()=>{
+  const ta=document.getElementById("code-editor"); if(!ta)return;
+  const before=ta.value.slice(0,ta.selectionStart).split("\n");
+  document.getElementById("code-pos").textContent=`Ln ${before.length}, Col ${before[before.length-1].length+1}`;
+});
+function openContextMenu(x,y,items){
+  const m=document.getElementById("ctx-menu"); if(!m)return;
+  m.innerHTML=items.map((it,i)=>`<div class="ctx-item" data-i="${i}"><i class="bi ${it.icon}"></i>${it.label}</div>`).join("");
+  m.style.left=x+"px"; m.style.top=y+"px"; m.classList.add("open");
+  m.querySelectorAll(".ctx-item").forEach((el,i)=>el.onclick=()=>{m.classList.remove("open");items[i].action();});
+}
+function closeContextMenu(){document.getElementById("ctx-menu")?.classList.remove("open");}
+document.getElementById("desktop")?.addEventListener("contextmenu",e=>{
+  if(e.target.closest(".fm-file-item"))return;
+  e.preventDefault();
+  openContextMenu(e.clientX,e.clientY,[
+    {label:"Novo arquivo",icon:"bi-file-earmark-plus",action:()=>fmCreateFile()},
+    {label:"Nova pasta",icon:"bi-folder-plus",action:()=>fmCreateFolder()},
+    {label:"Abrir Configuracoes",icon:"bi-gear",action:()=>openSettings()}
+  ]);
+});
+document.addEventListener("click",()=>closeContextMenu());
 
 // ───── MANUAL PAGE ─────
 function showManPage(p){
@@ -1224,7 +1607,7 @@ function closeLesson(){document.getElementById("lesson-modal").classList.remove(
 // ───── CLOCK ─────
 function tick(){
   const n=new Date();
-  const days=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  const days=["Dom","Seg","Ter","Qua","Qui","Sex","Sab"];
   document.getElementById("topbar-center").textContent=`${days[n.getDay()]} ${n.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
   document.getElementById("top-clock-el").textContent=n.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 }
@@ -1248,7 +1631,7 @@ async function boot(){
     {t:"[  <span class='boot-ok'>OK</span>  ] Started Login Service.",d:80},
     {t:"[  <span class='boot-ok'>OK</span>  ] Started TermHacker Desktop Environment.",d:200},
     {t:"[  <span class='boot-ok'>OK</span>  ] Reached target Graphical Interface.",d:100},
-    {t:"<span class='boot-info'>[INFO] TermHacker OS v6.0 — Educational Linux Environment</span>",d:200},
+    {t:"<span class='boot-info'>[INFO] TermHacker OS v6.0 - Educational Linux Environment</span>",d:200},
   ];
   for(const m of bootMsgs){add(m.t);await sleep(m.d);}
   await sleep(400);
@@ -1257,14 +1640,15 @@ async function boot(){
   await sleep(600);
   document.getElementById("boot").style.display="none";
   document.getElementById("os").style.display="flex";
-  renderPrompt();updateMission();renderFM();updateSandboxUI();
+  renderPrompt();updateMission();renderFM();updateSandboxUI();renderCodeExplorer();
   await sleep(200);
-  printLine(`<span style="color:var(--text3);font-size:11px">TermHacker OS 6.0 — ambiente Linux educativo</span>`);
+  printLine(`<span style="color:var(--text3);font-size:11px">TermHacker OS 6.0 - ambiente Linux educativo</span>`);
   printLine(`<span style="color:var(--text3);font-size:11px">Digite <span style="color:var(--accent)">help</span> para comandos, <span style="color:var(--accent)">sandbox on</span> para isolamento, <span style="color:var(--accent)">tree</span> para explorar e <span style="color:var(--accent)">TAB</span> para autocompletar.</span>`);
   printBlank();
   realInput.focus();
 }
 window.addEventListener("load",boot);
+document.querySelectorAll("[data-ic]").forEach(el=>{el.innerHTML=iconSvg(el.dataset.ic,el.classList.contains("ic-lg")?"ic ic-lg":"ic");});
 </script>
 </body>
 </html>
